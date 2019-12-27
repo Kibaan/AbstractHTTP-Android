@@ -1,12 +1,12 @@
 package kibaan.android.abstracthttp.entity
 
-import kibaan.android.abstracthttp.enum_type.HTTPMethod
+import kibaan.android.abstracthttp.enumtype.HTTPMethod
 import java.net.URL
 
 /**
  * HTTPのリクエスト
  */
-class Request public constructor(
+class Request(
     /** リクエストするURL */
     val url: URL,
     /** HTTPリクエストメソッド */

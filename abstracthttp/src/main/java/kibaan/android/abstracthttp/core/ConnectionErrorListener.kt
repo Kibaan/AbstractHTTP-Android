@@ -2,7 +2,7 @@ package kibaan.android.abstracthttp.core
 
 import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Response
-import kibaan.android.abstracthttp.enum_type.EventChain
+import kibaan.android.abstracthttp.enumtype.EventChain
 
 /**
  * 通信エラーを受け取るリスナー。
@@ -44,7 +44,7 @@ interface ConnectionErrorListener {
      * @param response HTTPレスポンスの情報
      * @param responseModel パースされたレスポンスデータモデル
      */
-    fun onValidationError(connection: Connection<*>, response: Response, responseModel: Any?): EventChain
+    fun onValidationError(connection: Connection<*>, response: Response, responseModel: Any): EventChain
 
     /**
      * Connection.startの引数に渡したエラーコールバックの実行直後に呼ばれる

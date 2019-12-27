@@ -1,12 +1,11 @@
-package kibaan.android.abstracthttp.default_impl
+package kibaan.android.abstracthttp.defaultimpl
 
 import kibaan.android.abstracthttp.core.HTTPConnector
 import kibaan.android.abstracthttp.entity.Request
 import kibaan.android.abstracthttp.entity.Response
-import kibaan.android.abstracthttp.enum_type.HTTPMethod
+import kibaan.android.abstracthttp.enumtype.HTTPMethod
 import okhttp3.*
 import java.io.IOException
-import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 
 

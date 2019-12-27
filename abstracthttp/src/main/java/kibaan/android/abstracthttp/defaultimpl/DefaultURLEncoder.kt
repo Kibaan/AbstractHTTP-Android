@@ -1,4 +1,4 @@
-package kibaan.android.abstracthttp.default_impl
+package kibaan.android.abstracthttp.defaultimpl
 
 import kibaan.android.abstracthttp.core.URLEncoder
 

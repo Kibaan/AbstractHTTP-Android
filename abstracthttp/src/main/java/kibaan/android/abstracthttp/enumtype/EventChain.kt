@@ -1,4 +1,4 @@
-package kibaan.android.abstracthttp.enum_type
+package kibaan.android.abstracthttp.enumtype
 
 /**
  * 通信完了後イベントの続行・停止ステータス

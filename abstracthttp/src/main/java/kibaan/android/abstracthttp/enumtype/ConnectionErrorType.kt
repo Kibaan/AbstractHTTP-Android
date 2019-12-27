@@ -1,4 +1,4 @@
-package kibaan.android.abstracthttp.enum_type
+package kibaan.android.abstracthttp.enumtype
 
 /**
  * HTTP通信のエラー種別

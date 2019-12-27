@@ -1,6 +1,6 @@
 package kibaan.android.abstracthttp.entity
 
-import kibaan.android.abstracthttp.enum_type.ConnectionErrorType
+import kibaan.android.abstracthttp.enumtype.ConnectionErrorType
 
 /**
  * 通信エラーの情報

@@ -1,4 +1,4 @@
-package kibaan.android.abstracthttp.default_impl
+package kibaan.android.abstracthttp.defaultimpl
 
 import android.os.Handler
 import kibaan.android.abstracthttp.core.Connection
@@ -6,7 +6,7 @@ import kibaan.android.abstracthttp.core.ConnectionListener
 import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Request
 import kibaan.android.abstracthttp.entity.Response
-import kibaan.android.abstracthttp.enum_type.ConnectionErrorType
+import kibaan.android.abstracthttp.enumtype.ConnectionErrorType
 
 class Polling(val delay: Long, val callback: () -> Unit) : ConnectionListener {
 

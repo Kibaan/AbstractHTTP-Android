@@ -3,7 +3,7 @@ package kibaan.android.abstracthttp.examples.simplest
 import kibaan.android.abstracthttp.core.ConnectionSpec
 import kibaan.android.abstracthttp.entity.Response
 import kibaan.android.abstracthttp.entity.URLQuery
-import kibaan.android.abstracthttp.enum_type.HTTPMethod
+import kibaan.android.abstracthttp.enumtype.HTTPMethod
 
 /**
  * 最小構成のConnectionSpec実装

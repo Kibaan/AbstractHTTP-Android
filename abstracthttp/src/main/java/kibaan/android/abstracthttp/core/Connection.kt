@@ -1,16 +1,14 @@
 package kibaan.android.abstracthttp.core
 
 import android.os.Handler
-import android.os.Looper
-import kibaan.android.abstracthttp.default_impl.DefaultHTTPConnector
-import kibaan.android.abstracthttp.default_impl.DefaultURLEncoder
+import kibaan.android.abstracthttp.defaultimpl.DefaultHTTPConnector
+import kibaan.android.abstracthttp.defaultimpl.DefaultURLEncoder
 import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Request
 import kibaan.android.abstracthttp.entity.Response
 import kibaan.android.abstracthttp.entity.URLQuery
-import kibaan.android.abstracthttp.enum_type.ConnectionErrorType
-import kibaan.android.abstracthttp.enum_type.EventChain
-import java.lang.Exception
+import kibaan.android.abstracthttp.enumtype.ConnectionErrorType
+import kibaan.android.abstracthttp.enumtype.EventChain
 import java.net.URL
 
 /**
@@ -19,10 +17,11 @@ import java.net.URL
  *
  * The lifecycle of a HTTP connection.
  */
-open class Connection<ResponseModel> {
-    lateinit var requestSpec: RequestSpec
-    lateinit var parseResponse: (Response) -> ResponseModel
-    lateinit var isValidResponse: (Response) -> Boolean
+open class Connection<ResponseModel: Any> {
+
+    var requestSpec: RequestSpec
+    var parseResponse: (Response) -> ResponseModel
+    var isValidResponse: (Response) -> Boolean
 
     var listeners: MutableList<ConnectionListener> = mutableListOf()
     var responseListeners: MutableList<ConnectionResponseListener> = mutableListOf()
@@ -128,6 +127,7 @@ open class Connection<ResponseModel> {
             handleError(ConnectionErrorType.invalidURL)
             return
         }
+
         // リクエスト作成
         val request = request ?: Request(
             url = url,
@@ -142,14 +142,14 @@ open class Connection<ResponseModel> {
         }
 
         // このインスタンスが通信完了まで開放されないよう保持する必要がある
-        holder?.add(connection = this)
+        holder.add(connection = this)
 
-        print("[${requestSpec.httpMethod.stringValue}] ${url}")
+        print("[${requestSpec.httpMethod.stringValue}] $url")
 
         // 通信する
         connector.execute(request = request, complete = { response, error ->
             this.complete(response = response, error = error)
-            this.holder?.remove(connection = this)
+            this.holder.remove(connection = this)
         })
 
         latestRequest = request
@@ -169,12 +169,12 @@ open class Connection<ResponseModel> {
             return
         }
 
-        var isValidResponse = true
+        var listenerValidationResult = true
         responseListeners.forEach {
-            isValidResponse = isValidResponse && it.onReceived(connection = this, response = response)
+            listenerValidationResult = listenerValidationResult && it.onReceived(connection = this, response = response)
         }
 
-        if (!isValidResponse || !this.isValidResponse(response)) {
+        if (!listenerValidationResult || !isValidResponse(response)) {
             onResponseError(response = response)
             return
         }
@@ -183,6 +183,7 @@ open class Connection<ResponseModel> {
     }
 
     open fun handleResponse(response: Response) {
+
         val responseModel: ResponseModel
 
         try {
@@ -192,11 +193,11 @@ open class Connection<ResponseModel> {
             return
         }
 
-        var isValidResponse = true
+        var listenerValidationResult = true
         responseListeners.forEach {
-            isValidResponse = isValidResponse && it.onReceivedModel(connection = this, responseModel = responseModel)
+            listenerValidationResult = listenerValidationResult && it.onReceivedModel(connection = this, responseModel = responseModel)
         }
-        if (!isValidResponse) {
+        if (!listenerValidationResult) {
             onValidationError(response = response, responseModel = responseModel)
             return
         }
@@ -262,7 +263,9 @@ open class Connection<ResponseModel> {
             return
         }
 
-        callback { callError() }
+        callback {
+            callError()
+        }
     }
 
     /**
@@ -275,6 +278,7 @@ open class Connection<ResponseModel> {
         responseModel: ResponseModel? = null
     ) {
         val message = error?.toString() ?: ""
+        // TODO Releaseの場合に表示されないようにする
         print("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
 
         val connectionError = ConnectionError(type = type, nativeError = error)
@@ -320,6 +324,7 @@ open class Connection<ResponseModel> {
 
     open fun callback(function: () -> Unit) {
         if (callbackInMainThread) {
+            // TODO Handlerは入れたくない
             handler.post {
                 function.invoke()
             }
@@ -330,11 +335,13 @@ open class Connection<ResponseModel> {
 
     open fun makeURL(baseURL: String, query: URLQuery?, encoder: URLEncoder): URL? {
         var urlStr = baseURL
+
         val query = query
         if (query != null) {
             val separator = if (urlStr.contains("?")) "&" else "?"
             urlStr += separator + query.stringValue(encoder = urlEncoder)
         }
+
         return URL(urlStr)
     }
 }
@@ -345,6 +352,6 @@ data class DefaultImplementation(
     var httpConnector: () -> HTTPConnector = { DefaultHTTPConnector() }
 ) {
     companion object {
-        public var shared = DefaultImplementation()
+        var shared = DefaultImplementation()
     }
 }

@@ -1,6 +1,6 @@
 package kibaan.android.abstracthttp.core
 
-import kibaan.android.abstracthttp.enum_type.HTTPMethod
+import kibaan.android.abstracthttp.enumtype.HTTPMethod
 import kibaan.android.abstracthttp.entity.URLQuery
 
 /**
