@@ -15,7 +15,7 @@ interface HTTPConnector {
      * @param request URL、HTTPメソッド、ヘッダー、パラメーターなどを含むリクエスト情報
      * @param complete 通信完了時に実行されるコールバック。コールバックの引数にはレスポンスの情報と発生したエラーを渡す
      */
-    fun execute(request: Request, complete: (Response?, Error?) -> Unit)
+    fun execute(request: Request, complete: (Response?, Exception?) -> Unit)
 
     /**
      * 実行中の通信をキャンセルする

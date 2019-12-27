@@ -3,24 +3,24 @@ package kibaan.android.abstracthttp.enumtype
 /**
  * HTTP通信のエラー種別
  */
-sealed class ConnectionErrorType : Exception() {
+enum class ConnectionErrorType {
     /** 不正なURL */
-    object invalidURL : ConnectionErrorType()
+    invalidURL,
 
     /** オフライン、タイムアウトなどのネットワークエラー */
-    object network : ConnectionErrorType()
+    network,
 
     /** レスポンスデータが規定ではない */
-    object invalidResponse : ConnectionErrorType()
+    invalidResponse,
 
     /** レスポンスのパースに失敗 */
-    object parse : ConnectionErrorType()
+    parse,
 
     /** バリデーションエラー */
-    object validation : ConnectionErrorType()
+    validation,
 
     /** キャンセル */
-    object canceled : ConnectionErrorType()
+    canceled;
 
     val description: String
         get() {

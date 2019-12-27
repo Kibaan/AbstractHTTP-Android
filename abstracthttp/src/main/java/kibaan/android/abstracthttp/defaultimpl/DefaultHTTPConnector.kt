@@ -35,7 +35,7 @@ class DefaultHTTPConnector : HTTPConnector {
 //        }
 //    }
 
-    override fun execute(request: Request, complete: (Response?, Error?) -> Unit) {
+    override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
         isCancelled = false
 
         val client = httpClient.newBuilder()
@@ -54,7 +54,7 @@ class DefaultHTTPConnector : HTTPConnector {
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                complete(null, null)
+                complete(null, e)
                 this@DefaultHTTPConnector.httpCall = null
             }
         })

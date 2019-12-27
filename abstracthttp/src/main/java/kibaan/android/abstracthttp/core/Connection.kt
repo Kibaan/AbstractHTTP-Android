@@ -158,7 +158,7 @@ open class Connection<ResponseModel: Any> {
     /**
      * 通信完了時の処理
      */
-    private fun complete(response: Response?, error: Error?) {
+    private fun complete(response: Response?, error: Exception?) {
         if (isCancelled) {
             return
         }
@@ -188,8 +188,8 @@ open class Connection<ResponseModel: Any> {
 
         try {
             responseModel = parseResponse(response)
-        } catch (e: Exception) {
-            onParseError(response = response)
+        } catch (error: Exception) {
+            onParseError(response = response, error = error)
             return
         }
 
@@ -211,7 +211,7 @@ open class Connection<ResponseModel: Any> {
         }
     }
 
-    fun onNetworkError(error: Error?) {
+    fun onNetworkError(error: Exception?) {
         controlError(callListener = {
             it.onNetworkError(connection = this, error = error)
         }, callError = {
@@ -227,11 +227,11 @@ open class Connection<ResponseModel: Any> {
         })
     }
 
-    fun onParseError(response: Response) {
+    fun onParseError(response: Response, error: Exception) {
         controlError(callListener = {
-            it.onParseError(connection = this, response = response)
+            it.onParseError(connection = this, response = response, error = error)
         }, callError = {
-            this.handleError(ConnectionErrorType.parse, response = response)
+            this.handleError(ConnectionErrorType.parse, error = error, response = response)
         })
     }
 
@@ -273,7 +273,7 @@ open class Connection<ResponseModel: Any> {
      */
     open fun handleError(
         type: ConnectionErrorType,
-        error: Error? = null,
+        error: Exception? = null,
         response: Response? = null,
         responseModel: ResponseModel? = null
     ) {

@@ -3,10 +3,11 @@ package kibaan.android.abstracthttp.core
 import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Response
 import kibaan.android.abstracthttp.enumtype.EventChain
+import kotlin.Exception
 
 /**
  * 通信エラーを受け取るリスナー。
- * afterError以外のエラーコールバックは、Connecionに渡したエラーコールバックの実行前にバックグラウンドスレッドで呼ばれる。
+ * afterError以外のエラーコールバックは、Connectionに渡したエラーコールバックの実行前にバックグラウンドスレッドで呼ばれる。
  *
  * バックグラウンドスレッドから呼び出されるため、UIの操作を行う場合はメインスレッドに切り替える必要がある
  */
@@ -17,7 +18,7 @@ interface ConnectionErrorListener {
      * @param connection 通信オブジェクト
      * @param error エラー情報
      */
-    fun onNetworkError(connection: Connection<*>, error: Error?): EventChain
+    fun onNetworkError(connection: Connection<*>, error: Exception?): EventChain
 
     /**
      * レスポンス内容のパース前のバリデーションエラー時に呼ばれる。
@@ -33,8 +34,9 @@ interface ConnectionErrorListener {
      *
      * @param connection 通信オブジェクト
      * @param response HTTPレスポンスの情報
+     * @param error エラー情報
      */
-    fun onParseError(connection: Connection<*>, response: Response): EventChain
+    fun onParseError(connection: Connection<*>, response: Response, error: Throwable): EventChain
 
     /**
      * レスポンスモデルのバリデーションエラー時に呼ばれる。

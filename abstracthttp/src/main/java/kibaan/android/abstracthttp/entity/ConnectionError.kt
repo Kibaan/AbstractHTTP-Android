@@ -7,5 +7,5 @@ import kibaan.android.abstracthttp.enumtype.ConnectionErrorType
  */
 data class ConnectionError(
     val type: ConnectionErrorType,
-    val nativeError: Error?
+    val nativeError: Exception?
 )
