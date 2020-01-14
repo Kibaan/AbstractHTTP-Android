@@ -28,6 +28,7 @@ class ConnectionIndicator(val view: View) : ConnectionListener {
     }
 
     fun updateViewInMainThread() {
+        // TODO Handlerを使わない
         Handler().post { this.updateView() }
     }
 

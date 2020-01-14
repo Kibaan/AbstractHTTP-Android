@@ -324,7 +324,7 @@ open class Connection<ResponseModel: Any> {
 
     open fun callback(function: () -> Unit) {
         if (callbackInMainThread) {
-            // TODO Handlerは入れたくない
+            // TODO Handlerを使わない
             handler.post {
                 function.invoke()
             }
