@@ -22,15 +22,17 @@ class Polling(val delaySeconds: Long, val callback: () -> Unit) : ConnectionList
     override fun onEnd(connection: Connection<*>, response: Response?, responseModel: Any?, error: ConnectionError?) {
         if (error == null || error.type == ConnectionErrorType.network) {
             timer = Timer().schedule(0, delaySeconds * 1000) {
+                timer = null
                 callback()
             }
         } else if (error.type == ConnectionErrorType.canceled) {
             timer?.cancel()
+            timer = null
         }
         this.connection = null
     }
 
-    public fun stop() {
+    fun stop() {
         timer?.cancel()
         timer = null
         connection?.cancel()
