@@ -12,6 +12,14 @@ class ConnectionHolder {
 
     private var connections: MutableList<Connection<*>> = mutableListOf()
 
+    private var listeners: MutableList<ConnectionHolderListener> = mutableListOf()
+
+    /**
+     * 保持する通信オブジェクトの数
+     */
+    val count: Int
+        get() = connections.size
+
     /**
      * 通信オブジェクトを追加する。
      * 既に同じものが保持されている場合は何もしない
@@ -21,6 +29,9 @@ class ConnectionHolder {
     fun add(connection: Connection<*>) {
         if (!contains(connection = connection)) {
             connections.add(connection)
+            listeners.forEach {
+                it.onAdded(connection, connections.size)
+            }
         }
     }
 
@@ -29,8 +40,11 @@ class ConnectionHolder {
      *
      * @param connection 削除する通信オブジェクト
      */
-    fun remove(connection: Connection<*>?) {
+    fun remove(connection: Connection<*>) {
         connections.removeAll { it === connection }
+        listeners.forEach {
+            it.onRemoved(connection, connections.size)
+        }
     }
 
     /**
@@ -42,15 +56,27 @@ class ConnectionHolder {
     fun contains(connection: Connection<*>?): Boolean =
         connections.contains(connection)
 
-    /**
-     * 保持する全ての通信オブジェクトを削除する。
-     */
-    fun removeAll() {
-        connections.clear()
-    }
-
     /// 保持する全ての通信をキャンセルする
     fun cancelAll() {
         connections.forEach { it.cancel() }
     }
+
+
+    /// リスナーを追加する
+    fun addListener(listener: ConnectionHolderListener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener)
+        }
+    }
+
+    /// リスナーを削除する
+    fun removeListener(listener: ConnectionHolderListener) {
+        listeners.removeAll { it === listener }
+    }
+
+}
+
+interface ConnectionHolderListener {
+    fun onAdded(connection: Connection<*>, count: Int)
+    fun onRemoved(connection: Connection<*>, count: Int)
 }
