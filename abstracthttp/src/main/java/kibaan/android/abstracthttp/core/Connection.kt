@@ -27,8 +27,10 @@ open class Connection<ResponseModel: Any> {
     var responseListeners: MutableList<ConnectionResponseListener> = mutableListOf()
     var errorListeners: MutableList<ConnectionErrorListener> = mutableListOf()
 
-    var connector: HTTPConnector = DefaultImplementation.shared.httpConnector()
-    var urlEncoder: URLEncoder = DefaultImplementation.shared.urlEncoder()
+    var connector: HTTPConnector = ConnectionConfig.shared.httpConnector()
+    var urlEncoder: URLEncoder = ConnectionConfig.shared.urlEncoder()
+
+    var isLogEnabled = ConnectionConfig.shared.isLogEnabled
 
     /**
      * キャンセルされたかどうか。このフラグが `true` だと通信終了してもコールバックが呼ばれない
@@ -144,7 +146,10 @@ open class Connection<ResponseModel: Any> {
         // このインスタンスが通信完了まで開放されないよう保持する必要がある
         holder.add(connection = this)
 
-        print("[${requestSpec.httpMethod.stringValue}] $url")
+        if (isLogEnabled) {
+            // TODO ログ出力する
+            print("[${requestSpec.httpMethod.stringValue}] $url")
+        }
 
         // 通信する
         connector.execute(request = request, complete = { response, error ->
@@ -275,11 +280,13 @@ open class Connection<ResponseModel: Any> {
         type: ConnectionErrorType,
         error: Exception? = null,
         response: Response? = null,
-        responseModel: ResponseModel? = null
-    ) {
-        val message = error?.toString() ?: ""
-        // TODO Releaseの場合に表示されないようにする
-        print("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
+        responseModel: ResponseModel? = null) {
+        
+        if (isLogEnabled) {
+            val message = error?.toString() ?: ""
+            // TODO Releaseの場合に表示されないようにする
+            print("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
+        }
 
         val connectionError = ConnectionError(type = type, nativeError = error)
         onError?.invoke(connectionError, response, responseModel)
@@ -343,15 +350,5 @@ open class Connection<ResponseModel: Any> {
         }
 
         return URL(urlStr)
-    }
-}
-
-// TODO この参照方法は少し汚い
-data class DefaultImplementation(
-    var urlEncoder: () -> URLEncoder = { DefaultURLEncoder() },
-    var httpConnector: () -> HTTPConnector = { DefaultHTTPConnector() }
-) {
-    companion object {
-        var shared = DefaultImplementation()
     }
 }
