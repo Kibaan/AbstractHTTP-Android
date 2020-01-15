@@ -121,9 +121,9 @@ open class Connection<ResponseModel: Any> {
     /**
      * 通信処理を開始する
      *
-     * @param shouldNotify 通信開始のコールバックを呼び出す場合は `true`。リスナーに通知せず再通信したい場合に `false` を指定する。
+     * @param implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
      */
-    private fun connect(request: Request? = null, shouldNotify: Boolean = true) {
+    private fun connect(request: Request? = null, implicitly: Boolean = true) {
         val url = makeURL(baseURL = requestSpec.url, query = requestSpec.urlQuery, encoder = urlEncoder)
         if (url == null) {
             handleError(ConnectionErrorType.invalidURL)
@@ -137,7 +137,7 @@ open class Connection<ResponseModel: Any> {
             body = requestSpec.makePostData(),
             headers = requestSpec.headers.toMutableMap()
         )
-        if (shouldNotify) {
+        if (!implicitly) {
             listeners.forEach {
                 it.onStart(connection = this, request = request)
             }
@@ -305,10 +305,22 @@ open class Connection<ResponseModel: Any> {
 
     /**
      * 通信を再実行する
+     *
+     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
      */
-    open fun restart(cloneRequest: Boolean, shouldNotify: Boolean) {
-        val request = if (cloneRequest) latestRequest else null
-        connect(request = request, shouldNotify = shouldNotify)
+    open fun restart(implicitly: Boolean) {
+        connect(implicitly = implicitly)
+    }
+
+    /**
+     * 直近のリクエストを再送信する。
+     * `restart` に近いふるまいになるが、リクエスト内容を再構築するか直近と全く同じリクエスト内容を使うかが異なる。
+     * 例えばリクエストパラメーターに現在時刻を動的に含める場合、`repeatRequest` では前回リクエストと同時刻になるが `restart` では新しい時刻が設定される。
+     *
+     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
+     */
+    open fun repeatRequest(implicitly: Boolean) {
+        connect(request = latestRequest, implicitly = implicitly)
     }
 
     /**
@@ -322,6 +334,7 @@ open class Connection<ResponseModel: Any> {
         errorListeners.forEach { it.onCanceled(connection = this) }
         val error = ConnectionError(type = ConnectionErrorType.canceled, nativeError = null)
         end(response = null, responseModel = null, error = error)
+        holder.remove(connection = this)
     }
 
     private fun end(response: Response?, responseModel: Any?, error: ConnectionError?) {
