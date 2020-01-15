@@ -154,7 +154,6 @@ open class Connection<ResponseModel: Any> {
         // 通信する
         connector.execute(request = request, complete = { response, error ->
             this.complete(response = response, error = error)
-            this.holder.remove(connection = this)
         })
 
         latestRequest = request
@@ -334,12 +333,12 @@ open class Connection<ResponseModel: Any> {
         errorListeners.forEach { it.onCanceled(connection = this) }
         val error = ConnectionError(type = ConnectionErrorType.canceled, nativeError = null)
         end(response = null, responseModel = null, error = error)
-        holder.remove(connection = this)
     }
 
     private fun end(response: Response?, responseModel: Any?, error: ConnectionError?) {
         listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
         onEnd?.invoke(response, responseModel, error)
+        holder.remove(connection = this)
     }
 
     open fun callback(function: () -> Unit) {
