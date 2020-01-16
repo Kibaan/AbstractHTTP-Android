@@ -47,12 +47,6 @@ open class Connection<ResponseModel: Any> {
      */
     var onSuccess: ((ResponseModel) -> Unit)? = null
 
-    /**
-     * 終了コールバック
-     * (response: Response?, responseModel: Any?, error: ConnectionError?) -> Void
-     */
-    var onEnd: ((Response?, Any?, ConnectionError?) -> Unit)? = null
-
     var latestRequest: Request? = null
         private set
 
@@ -100,7 +94,7 @@ open class Connection<ResponseModel: Any> {
     }
 
     fun setOnEnd(onEnd: (Response?, Any?, ConnectionError?) -> Unit): Connection<*> {
-        this.onEnd = onEnd
+        addListener(OnEnd(onEnd))
         return this
     }
 
@@ -319,7 +313,6 @@ open class Connection<ResponseModel: Any> {
 
     private fun end(response: Response?, responseModel: Any?, error: ConnectionError?) {
         listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
-        onEnd?.invoke(response, responseModel, error)
         holder.remove(connection = this)
     }
     
