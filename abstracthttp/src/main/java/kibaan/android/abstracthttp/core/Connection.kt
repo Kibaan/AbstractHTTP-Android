@@ -1,8 +1,6 @@
 package kibaan.android.abstracthttp.core
 
 import android.os.Handler
-import kibaan.android.abstracthttp.defaultimpl.DefaultHTTPConnector
-import kibaan.android.abstracthttp.defaultimpl.DefaultURLEncoder
 import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Request
 import kibaan.android.abstracthttp.entity.Response
@@ -27,7 +25,7 @@ open class Connection<ResponseModel: Any> {
     var responseListeners: MutableList<ConnectionResponseListener> = mutableListOf()
     var errorListeners: MutableList<ConnectionErrorListener> = mutableListOf()
 
-    var connector: HTTPConnector = ConnectionConfig.shared.httpConnector()
+    var httpConnector: HTTPConnector = ConnectionConfig.shared.httpConnector()
     var urlEncoder: URLEncoder = ConnectionConfig.shared.urlEncoder()
 
     var isLogEnabled = ConnectionConfig.shared.isLogEnabled
@@ -152,7 +150,7 @@ open class Connection<ResponseModel: Any> {
         }
 
         // 通信する
-        connector.execute(request = request, complete = { response, error ->
+        httpConnector.execute(request = request, complete = { response, error ->
             this.complete(response = response, error = error)
         })
 
@@ -328,7 +326,7 @@ open class Connection<ResponseModel: Any> {
     open fun cancel() {
         // TODO 既に通信コールバックが走っている場合何もしない。通信コールバック内でキャンセルした場合に、onEndが二重で呼ばれないようにする必要がある
         isCancelled = true
-        connector.cancel()
+        httpConnector.cancel()
 
         errorListeners.forEach { it.onCanceled(connection = this) }
         val error = ConnectionError(type = ConnectionErrorType.canceled, nativeError = null)
