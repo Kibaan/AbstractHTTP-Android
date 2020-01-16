@@ -15,15 +15,28 @@ import java.net.URL
  */
 open class Connection<ResponseModel: Any> {
 
+    /** HTTPリクエストの仕様 */
     var requestSpec: RequestSpec
-    var parseResponse: (Response) -> ResponseModel
+
+    /** レスポンスデータの正当性を検証する */
     var isValidResponse: (Response) -> Boolean
 
+    /** 通信レスポンスをデータモデルに変換する */
+    var parseResponse: (Response) -> ResponseModel
+
+    /** 通信開始と終了のリスナー */
     var listeners: MutableList<ConnectionListener> = mutableListOf()
+
+    /** 通信レスポンス処理のリスナー */
     var responseListeners: MutableList<ConnectionResponseListener> = mutableListOf()
+
+    /** エラーのリスナー */
     var errorListeners: MutableList<ConnectionErrorListener> = mutableListOf()
 
+    /** HTTP通信処理 */
     var httpConnector: HTTPConnector = ConnectionConfig.shared.httpConnector()
+
+    /** URLエンコード処理 */
     var urlEncoder: URLEncoder = ConnectionConfig.shared.urlEncoder()
 
     /** ログ出力を有効にするか */
@@ -269,7 +282,7 @@ open class Connection<ResponseModel: Any> {
 
 
     /**
-     * エラーを処理する
+     * エラーを処理の実行
      */
     private fun errorProcess(type: ConnectionErrorType,
                              error: Exception? = null,
