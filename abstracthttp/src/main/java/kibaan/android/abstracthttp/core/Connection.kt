@@ -1,6 +1,5 @@
 package kibaan.android.abstracthttp.core
 
-import android.os.Handler
 import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Request
 import kibaan.android.abstracthttp.entity.Response
@@ -28,6 +27,7 @@ open class Connection<ResponseModel: Any> {
     var httpConnector: HTTPConnector = ConnectionConfig.shared.httpConnector()
     var urlEncoder: URLEncoder = ConnectionConfig.shared.urlEncoder()
 
+    /** ログ出力を有効にするか */
     var isLogEnabled = ConnectionConfig.shared.isLogEnabled
 
     /**
@@ -37,22 +37,21 @@ open class Connection<ResponseModel: Any> {
     var isCancelled = false
         private set
 
-    /**
-     * コールバックをメインスレッドで呼び出すか
-     */
+    /** コールバックをメインスレッドで呼び出すか */
     var callbackInMainThread = true
 
-    /**
-     * 通信成功時のコールバック
-     */
+    /** 通信成功時のコールバック */
     var onSuccess: ((ResponseModel) -> Unit)? = null
 
+    /** 直近のリクエスト */
     var latestRequest: Request? = null
         private set
 
+    /** 実行中の通信オブジェクトを保持するコンテナ */
     var holder = ConnectionHolder.shared
 
-    val handler = Handler()
+    /** UIスレッドでの実行 */
+    var runOnUiThread: (() -> Unit) -> Unit = ConnectionConfig.shared.runOnUiThread
 
     constructor(requestSpec: RequestSpec, responseSpec: ResponseSpec<ResponseModel>, onSuccess: ((ResponseModel) -> Unit)? = null) {
         this.requestSpec = requestSpec
@@ -355,8 +354,7 @@ open class Connection<ResponseModel: Any> {
 
     open fun callback(function: () -> Unit) {
         if (callbackInMainThread) {
-            // TODO Handlerを使わない
-            handler.post {
+            runOnUiThread {
                 function.invoke()
             }
         } else {

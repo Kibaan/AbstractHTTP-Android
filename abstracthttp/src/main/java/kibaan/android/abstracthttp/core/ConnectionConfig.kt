@@ -1,5 +1,7 @@
 package kibaan.android.abstracthttp.core
 
+import android.os.Handler
+import android.os.Looper
 import kibaan.android.abstracthttp.defaultimpl.DefaultHTTPConnector
 import kibaan.android.abstracthttp.defaultimpl.DefaultURLEncoder
 
@@ -19,4 +21,10 @@ class ConnectionConfig {
 
     /// 標準のURLEncoder
     var urlEncoder: () -> URLEncoder = { DefaultURLEncoder() }
+
+    /// UIスレッドでの実行
+    var runOnUiThread: (() -> Unit) -> Unit = {
+        val handler = Handler(Looper.getMainLooper())
+        handler.post(it)
+    }
 }

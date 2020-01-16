@@ -1,6 +1,5 @@
 package kibaan.android.abstracthttp.defaultimpl
 
-import android.os.Handler
 import android.view.View
 import kibaan.android.abstracthttp.core.Connection
 import kibaan.android.abstracthttp.core.ConnectionListener
@@ -19,17 +18,16 @@ class ConnectionIndicator(val view: View) : ConnectionListener {
 
     override fun onStart(connection: Connection<*>, request: Request) {
         referenceCount += 1
-        updateViewInMainThread()
+        connection.runOnUiThread {
+            this.updateView()
+        }
     }
 
     override fun onEnd(connection: Connection<*>, response: Response?, responseModel: Any?, error: ConnectionError?) {
         referenceCount -= 1
-        updateViewInMainThread()
-    }
-
-    fun updateViewInMainThread() {
-        // TODO Handlerを使わない
-        Handler().post { this.updateView() }
+        connection.runOnUiThread {
+            this.updateView()
+        }
     }
 
     fun updateView() {
