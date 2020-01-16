@@ -93,7 +93,11 @@ open class Connection<ResponseModel: Any> {
         return this
     }
 
-    fun setOnEnd(onEnd: (Response?, Any?, ConnectionError?) -> Unit): Connection<*> {
+    /**
+     * 終了処理を追加する。
+     * 終了処理は `ConnectionListener` として登録され、このプロトコルを経由して引数の`onEnd`が実行される
+     */
+    fun addOnEnd(onEnd: (Response?, Any?, ConnectionError?) -> Unit): Connection<*> {
         addListener(OnEnd(onEnd))
         return this
     }
