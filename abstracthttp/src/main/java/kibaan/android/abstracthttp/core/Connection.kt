@@ -87,6 +87,16 @@ open class Connection<ResponseModel: Any> {
         return this
     }
 
+    fun setOnError(onError: (ConnectionError, Response?, ResponseModel?) -> Unit): Connection<*> {
+        this.onError = onError
+        return this
+    }
+
+    fun setOnEnd(onEnd: (Response?, Any?, ConnectionError?) -> Unit): Connection<*> {
+        this.onEnd = onEnd
+        return this
+    }
+
     fun removeListener(listener: ConnectionListener) {
         listeners.removeAll { it === listener }
     }
@@ -98,17 +108,7 @@ open class Connection<ResponseModel: Any> {
     fun removeErrorListener(listener: ConnectionErrorListener) {
         errorListeners.removeAll { it === listener }
     }
-
-    fun setOnError(onError: (ConnectionError, Response?, ResponseModel?) -> Unit): Connection<*> {
-        this.onError = onError
-        return this
-    }
-
-    fun setOnEnd(onEnd: (Response?, Any?, ConnectionError?) -> Unit): Connection<*> {
-        this.onEnd = onEnd
-        return this
-    }
-
+    
     /**
      * 処理を開始する
      */
