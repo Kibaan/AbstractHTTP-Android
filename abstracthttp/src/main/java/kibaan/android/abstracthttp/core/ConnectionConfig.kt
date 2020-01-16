@@ -15,10 +15,8 @@ class ConnectionConfig {
     var isLogEnabled = true
 
     /// 標準のHTTPConnector
-    fun httpConnector() : HTTPConnector =
-        DefaultHTTPConnector()
+    var httpConnector: () -> HTTPConnector = { DefaultHTTPConnector() }
 
     /// 標準のURLEncoder
-    fun urlEncoder() : URLEncoder =
-        DefaultURLEncoder()
+    var urlEncoder: () -> URLEncoder = { DefaultURLEncoder() }
 }
