@@ -43,7 +43,6 @@ open class Connection<ResponseModel: Any> {
     var callbackInMainThread = true
 
     var onSuccess: ((ResponseModel) -> Unit)? = null
-    var onError: ((ConnectionError, Response?, ResponseModel?) -> Unit)? = null
 
     /**
      * 終了コールバック
@@ -87,8 +86,13 @@ open class Connection<ResponseModel: Any> {
         return this
     }
 
-    fun setOnError(onError: (ConnectionError, Response?, ResponseModel?) -> Unit): Connection<*> {
-        this.onError = onError
+    /**
+     * エラー処理を追加する。
+     * エラー処理は `ConnectionErrorListener` として登録され、このプロトコルを経由して引数の`onError`が実行される。
+     *
+     */
+    fun addOnError(onError: (ConnectionError, Response?, ResponseModel?) -> Unit): Connection<*> {
+        addErrorListener(OnError(onError))
         return this
     }
 
@@ -124,7 +128,7 @@ open class Connection<ResponseModel: Any> {
     private fun connect(request: Request? = null, implicitly: Boolean = true) {
         val url = makeURL(baseURL = requestSpec.url, query = requestSpec.urlQuery, encoder = urlEncoder)
         if (url == null) {
-            handleError(ConnectionErrorType.invalidURL)
+            onInvalidURLError()
             return
         }
 
@@ -213,42 +217,61 @@ open class Connection<ResponseModel: Any> {
         }
     }
 
+    fun onInvalidURLError() {
+        handleError(ConnectionErrorType.invalidURL) {
+            it.onNetworkError(connection = this, error = null)
+        }
+    }
+
     fun onNetworkError(error: Exception?) {
-        controlError(callListener = {
+        handleError(ConnectionErrorType.network, error = error) {
             it.onNetworkError(connection = this, error = error)
-        }, callError = {
-            this.handleError(ConnectionErrorType.network, error = error)
-        })
+        }
     }
 
     fun onResponseError(response: Response) {
-        controlError(callListener = {
+        handleError(ConnectionErrorType.invalidResponse, response = response) {
             it.onResponseError(connection = this, response = response)
-        }, callError = {
-            this.handleError(ConnectionErrorType.invalidResponse, response = response)
-        })
+        }
     }
 
     fun onParseError(response: Response, error: Exception) {
-        controlError(callListener = {
+        handleError(ConnectionErrorType.parse, error = error, response = response) {
             it.onParseError(connection = this, response = response, error = error)
-        }, callError = {
-            this.handleError(ConnectionErrorType.parse, error = error, response = response)
-        })
+        }
     }
 
     fun onValidationError(response: Response, responseModel: ResponseModel) {
-        controlError(callListener = {
+        handleError(ConnectionErrorType.validation, response = response, responseModel = responseModel) {
             it.onValidationError(connection = this, response = response, responseModel = responseModel)
-        }, callError = {
-            this.handleError(ConnectionErrorType.validation, response = response, responseModel = responseModel)
-        })
+        }
     }
 
     /**
      * エラーを処理する
      */
-    private fun controlError(callListener: (ConnectionErrorListener) -> EventChain, callError: () -> Unit) {
+    private fun handleError(type: ConnectionErrorType, error: Exception? = null, response: Response? = null, responseModel: ResponseModel? = null, callListener: (ConnectionErrorListener) -> EventChain) {
+        // エラーログ出力
+        if (isLogEnabled) {
+            val message = error?.toString() ?: ""
+            // TODO Log.dにしなくてよいのか？
+            print("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
+        }
+
+        callback {
+            errorProcess(type, error, response, responseModel, callListener)
+        }
+    }
+
+
+    /**
+     * エラーを処理する
+     */
+    private fun errorProcess(type: ConnectionErrorType,
+                             error: Exception? = null,
+                             response: Response? = null,
+                             responseModel: ResponseModel? = null,
+                             callListener: (ConnectionErrorListener) -> EventChain) {
         var stopNext = false
 
         for (i in errorListeners.indices) {
@@ -265,29 +288,19 @@ open class Connection<ResponseModel: Any> {
             return
         }
 
-        callback {
-            callError()
-        }
+        afterError(type, error = error, response = response, responseModel = responseModel)
     }
 
     /**
-     * エラーを処理する
+     * エラー後の処理
      */
-    open fun handleError(
+    open fun afterError(
         type: ConnectionErrorType,
         error: Exception? = null,
         response: Response? = null,
         responseModel: ResponseModel? = null) {
         
-        if (isLogEnabled) {
-            val message = error?.toString() ?: ""
-            // TODO Releaseの場合に表示されないようにする
-            print("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
-        }
-
         val connectionError = ConnectionError(type = type, nativeError = error)
-        onError?.invoke(connectionError, response, responseModel)
-
         errorListeners.forEach {
             it.afterError(
                 connection = this,
@@ -300,6 +313,13 @@ open class Connection<ResponseModel: Any> {
         end(response = response, responseModel = responseModel, error = connectionError)
     }
 
+
+    private fun end(response: Response?, responseModel: Any?, error: ConnectionError?) {
+        listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
+        onEnd?.invoke(response, responseModel, error)
+        holder.remove(connection = this)
+    }
+    
     /**
      * 通信を再実行する
      *
@@ -331,12 +351,6 @@ open class Connection<ResponseModel: Any> {
         errorListeners.forEach { it.onCanceled(connection = this) }
         val error = ConnectionError(type = ConnectionErrorType.canceled, nativeError = null)
         end(response = null, responseModel = null, error = error)
-    }
-
-    private fun end(response: Response?, responseModel: Any?, error: ConnectionError?) {
-        listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
-        onEnd?.invoke(response, responseModel, error)
-        holder.remove(connection = this)
     }
 
     open fun callback(function: () -> Unit) {

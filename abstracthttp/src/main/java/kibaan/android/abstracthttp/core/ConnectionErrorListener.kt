@@ -36,7 +36,7 @@ interface ConnectionErrorListener {
      * @param response HTTPレスポンスの情報
      * @param error エラー情報
      */
-    fun onParseError(connection: Connection<*>, response: Response, error: Throwable): EventChain
+    fun onParseError(connection: Connection<*>, response: Response, error: Exception): EventChain
 
     /**
      * レスポンスモデルのバリデーションエラー時に呼ばれる。

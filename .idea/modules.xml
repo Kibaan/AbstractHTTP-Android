@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AbstractHTTP-Android.iml" filepath="$PROJECT_DIR$/AbstractHTTP-Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/abstracthttp/AbstractHTTP-Android-abstracthttp.iml" filepath="$PROJECT_DIR$/abstracthttp/AbstractHTTP-Android-abstracthttp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/AbstractHTTP-Android-app.iml" filepath="$PROJECT_DIR$/app/AbstractHTTP-Android-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AndroidDev-AbstractHTTP-Android.iml" filepath="$PROJECT_DIR$/AndroidDev-AbstractHTTP-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/abstracthttp/abstracthttp.iml" filepath="$PROJECT_DIR$/abstracthttp/abstracthttp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
