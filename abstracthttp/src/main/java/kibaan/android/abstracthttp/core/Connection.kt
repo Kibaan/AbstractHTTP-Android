@@ -63,57 +63,51 @@ open class Connection<ResponseModel: Any> {
         this.onSuccess = onSuccess
     }
 
-    fun addListener(listener: ConnectionListener): Connection<*> {
-        listeners.add(listener)
-        return this
-    }
-
-    fun addResponseListener(listener: ConnectionResponseListener): Connection<*> {
-        responseListeners.add(listener)
-        return this
-    }
-
-    fun addErrorListener(listener: ConnectionErrorListener): Connection<*> {
-        errorListeners.add(listener)
-        return this
-    }
-
     /**
-     * エラー処理を追加する。
-     * エラー処理は `ConnectionErrorListener` として登録され、このプロトコルを経由して引数の`onError`が実行される。
-     *
-     */
-    fun addOnError(onError: (ConnectionError, Response?, ResponseModel?) -> Unit): Connection<*> {
-        addErrorListener(OnError(onError))
-        return this
-    }
-
-    /**
-     * 終了処理を追加する。
-     * 終了処理は `ConnectionListener` として登録され、このプロトコルを経由して引数の`onEnd`が実行される
-     */
-    fun addOnEnd(onEnd: (Response?, Any?, ConnectionError?) -> Unit): Connection<*> {
-        addListener(OnEnd(onEnd))
-        return this
-    }
-
-    fun removeListener(listener: ConnectionListener) {
-        listeners.removeAll { it === listener }
-    }
-
-    fun removeResponseListener(listener: ConnectionResponseListener) {
-        responseListeners.removeAll { it === listener }
-    }
-
-    fun removeErrorListener(listener: ConnectionErrorListener) {
-        errorListeners.removeAll { it === listener }
-    }
-    
-    /**
-     * 処理を開始する
+     * 通信を開始する
      */
     fun start() {
         connect()
+    }
+
+
+    /**
+     * 通信を再実行する
+     *
+     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
+     */
+    open fun restart(implicitly: Boolean) {
+        connect(implicitly = implicitly)
+    }
+
+    /**
+     * 直近のリクエストを再送信する。
+     * `restart` に近いふるまいになるが、リクエスト内容を再構築するか直近と全く同じリクエスト内容を使うかが異なる。
+     * 例えばリクエストパラメーターに現在時刻を動的に含める場合、`repeatRequest` では前回リクエストと同時刻になるが `restart` では新しい時刻が設定される。
+     *
+     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
+     */
+    open fun repeatRequest(implicitly: Boolean) {
+        connect(request = latestRequest, implicitly = implicitly)
+    }
+
+    /**
+     * 通信をキャンセルする
+     */
+    open fun cancel() {
+        // 既に実行完了している場合何もしない
+        val executionId = this.executionId ?: return
+
+        onCancel(executionId)
+        httpConnector.cancel()
+    }
+
+    /**
+     * コールバック処理の実行を中断する
+     */
+    open fun interrupt() {
+        executionId = null
+        holder.remove(connection = this)
     }
 
     /**
@@ -306,44 +300,51 @@ open class Connection<ResponseModel: Any> {
         executionId = null
         listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
     }
-    
+
+    fun addListener(listener: ConnectionListener): Connection<*> {
+        listeners.add(listener)
+        return this
+    }
+
+    fun addResponseListener(listener: ConnectionResponseListener): Connection<*> {
+        responseListeners.add(listener)
+        return this
+    }
+
+    fun addErrorListener(listener: ConnectionErrorListener): Connection<*> {
+        errorListeners.add(listener)
+        return this
+    }
+
     /**
-     * 通信を再実行する
+     * エラー処理を追加する。
+     * エラー処理は `ConnectionErrorListener` として登録され、このプロトコルを経由して引数の`onError`が実行される。
      *
-     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
      */
-    open fun restart(implicitly: Boolean) {
-        connect(implicitly = implicitly)
+    fun addOnError(onError: (ConnectionError, Response?, ResponseModel?) -> Unit): Connection<*> {
+        addErrorListener(OnError(onError))
+        return this
     }
 
     /**
-     * 直近のリクエストを再送信する。
-     * `restart` に近いふるまいになるが、リクエスト内容を再構築するか直近と全く同じリクエスト内容を使うかが異なる。
-     * 例えばリクエストパラメーターに現在時刻を動的に含める場合、`repeatRequest` では前回リクエストと同時刻になるが `restart` では新しい時刻が設定される。
-     *
-     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
+     * 終了処理を追加する。
+     * 終了処理は `ConnectionListener` として登録され、このプロトコルを経由して引数の`onEnd`が実行される
      */
-    open fun repeatRequest(implicitly: Boolean) {
-        connect(request = latestRequest, implicitly = implicitly)
+    fun addOnEnd(onEnd: (Response?, Any?, ConnectionError?) -> Unit): Connection<*> {
+        addListener(OnEnd(onEnd))
+        return this
     }
 
-    /**
-     * 通信をキャンセルする
-     */
-    open fun cancel() {
-        // 既に実行完了している場合何もしない
-        val executionId = this.executionId ?: return
-
-        onCancel(executionId)
-        httpConnector.cancel()
+    fun removeListener(listener: ConnectionListener) {
+        listeners.removeAll { it === listener }
     }
 
-    /**
-     * コールバック処理の実行を中断する
-     */
-    open fun interrupt() {
-        executionId = null
-        holder.remove(connection = this)
+    fun removeResponseListener(listener: ConnectionResponseListener) {
+        responseListeners.removeAll { it === listener }
+    }
+
+    fun removeErrorListener(listener: ConnectionErrorListener) {
+        errorListeners.removeAll { it === listener }
     }
 
     open fun callback(function: () -> Unit) {
