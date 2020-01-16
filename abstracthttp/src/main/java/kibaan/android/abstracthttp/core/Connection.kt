@@ -5,7 +5,6 @@ import kibaan.android.abstracthttp.entity.Request
 import kibaan.android.abstracthttp.entity.Response
 import kibaan.android.abstracthttp.entity.URLQuery
 import kibaan.android.abstracthttp.enumtype.ConnectionErrorType
-import kibaan.android.abstracthttp.enumtype.EventChain
 import java.net.URL
 
 /**
@@ -30,13 +29,6 @@ open class Connection<ResponseModel: Any> {
     /** ログ出力を有効にするか */
     var isLogEnabled = ConnectionConfig.shared.isLogEnabled
 
-    /**
-     * キャンセルされたかどうか。このフラグが `true` だと通信終了してもコールバックが呼ばれない
-     * Cancel後の再通信は想定しない
-     */
-    var isCancelled = false
-        private set
-
     /** コールバックをメインスレッドで呼び出すか */
     var callbackInMainThread = true
 
@@ -52,6 +44,10 @@ open class Connection<ResponseModel: Any> {
 
     /** UIスレッドでの実行 */
     var runOnUiThread: (() -> Unit) -> Unit = ConnectionConfig.shared.runOnUiThread
+
+    /** 実行ID */
+    var executionId: ExecutionId? = null
+        private set
 
     constructor(requestSpec: RequestSpec, responseSpec: ResponseSpec<ResponseModel>, onSuccess: ((ResponseModel) -> Unit)? = null) {
         this.requestSpec = requestSpec
@@ -126,9 +122,12 @@ open class Connection<ResponseModel: Any> {
      * @param implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
      */
     private fun connect(request: Request? = null, implicitly: Boolean = true) {
+        val executionId = ExecutionId()
+        this.executionId = executionId
+
         val url = makeURL(baseURL = requestSpec.url, query = requestSpec.urlQuery, encoder = urlEncoder)
         if (url == null) {
-            onInvalidURLError()
+            onInvalidURLError(executionId = executionId)
             return
         }
 
@@ -139,6 +138,7 @@ open class Connection<ResponseModel: Any> {
             body = requestSpec.makePostData(),
             headers = requestSpec.headers.toMutableMap()
         )
+
         if (!implicitly) {
             listeners.forEach {
                 it.onStart(connection = this, request = request)
@@ -155,7 +155,7 @@ open class Connection<ResponseModel: Any> {
 
         // 通信する
         httpConnector.execute(request = request, complete = { response, error ->
-            this.complete(response = response, error = error)
+            this.complete(response = response, error = error, executionId = executionId)
         })
 
         latestRequest = request
@@ -164,47 +164,46 @@ open class Connection<ResponseModel: Any> {
     /**
      * 通信完了時の処理
      */
-    private fun complete(response: Response?, error: Exception?) {
-        if (isCancelled) {
-            return
-        }
+    private fun complete(response: Response?, error: Exception?, executionId: ExecutionId) {
+        if (executionId != this.executionId) { return }
 
         val response = response
         if (response == null || error != null) {
-            onNetworkError(error = error)
+            onNetworkError(error = error, executionId = executionId)
             return
         }
 
-        var listenerValidationResult = true
+        var listenerResult = true
         responseListeners.forEach {
-            listenerValidationResult = listenerValidationResult && it.onReceived(connection = this, response = response)
+            listenerResult = listenerResult && it.onReceived(connection = this, response = response)
+            if (executionId != this.executionId) { return }
         }
 
-        if (!listenerValidationResult || !isValidResponse(response)) {
-            onResponseError(response = response)
+        if (!listenerResult || !isValidResponse(response)) {
+            onResponseError(response = response, executionId = executionId)
             return
         }
 
-        handleResponse(response = response)
+        handleResponse(response = response, executionId = executionId)
     }
 
-    open fun handleResponse(response: Response) {
+    open fun handleResponse(response: Response, executionId: ExecutionId) {
 
         val responseModel: ResponseModel
 
         try {
             responseModel = parseResponse(response)
         } catch (error: Exception) {
-            onParseError(response = response, error = error)
+            onParseError(response = response, error = error, executionId = executionId)
             return
         }
 
-        var listenerValidationResult = true
+        var listenerResult = true
         responseListeners.forEach {
-            listenerValidationResult = listenerValidationResult && it.onReceivedModel(connection = this, responseModel = responseModel)
+            listenerResult = listenerResult && it.onReceivedModel(connection = this, responseModel = responseModel)
         }
-        if (!listenerValidationResult) {
-            onValidationError(response = response, responseModel = responseModel)
+        if (!listenerResult) {
+            onValidationError(response = response, responseModel = responseModel, executionId = executionId)
             return
         }
 
@@ -217,40 +216,51 @@ open class Connection<ResponseModel: Any> {
         }
     }
 
-    fun onInvalidURLError() {
-        handleError(ConnectionErrorType.invalidURL) {
+    fun onInvalidURLError(executionId: ExecutionId) {
+        handleError(ConnectionErrorType.invalidURL, executionId = executionId) {
             it.onNetworkError(connection = this, error = null)
         }
     }
 
-    fun onNetworkError(error: Exception?) {
-        handleError(ConnectionErrorType.network, error = error) {
+    fun onNetworkError(error: Exception?, executionId: ExecutionId) {
+        handleError(ConnectionErrorType.network, error = error, executionId = executionId) {
             it.onNetworkError(connection = this, error = error)
         }
     }
 
-    fun onResponseError(response: Response) {
-        handleError(ConnectionErrorType.invalidResponse, response = response) {
+    fun onResponseError(response: Response, executionId: ExecutionId) {
+        handleError(ConnectionErrorType.invalidResponse, response = response, executionId = executionId) {
             it.onResponseError(connection = this, response = response)
         }
     }
 
-    fun onParseError(response: Response, error: Exception) {
-        handleError(ConnectionErrorType.parse, error = error, response = response) {
+    fun onParseError(response: Response, error: Exception, executionId: ExecutionId) {
+        handleError(ConnectionErrorType.parse, error = error, response = response, executionId = executionId) {
             it.onParseError(connection = this, response = response, error = error)
         }
     }
 
-    fun onValidationError(response: Response, responseModel: ResponseModel) {
-        handleError(ConnectionErrorType.validation, response = response, responseModel = responseModel) {
+    fun onValidationError(response: Response, responseModel: ResponseModel, executionId: ExecutionId) {
+        handleError(ConnectionErrorType.validation, response = response, responseModel = responseModel, executionId = executionId) {
             it.onValidationError(connection = this, response = response, responseModel = responseModel)
+        }
+    }
+
+    fun onCancel(executionId: ExecutionId) {
+        handleError(ConnectionErrorType.canceled, executionId = executionId) {
+            it.onCanceled(connection = this)
         }
     }
 
     /**
      * エラーを処理する
      */
-    private fun handleError(type: ConnectionErrorType, error: Exception? = null, response: Response? = null, responseModel: ResponseModel? = null, callListener: (ConnectionErrorListener) -> EventChain) {
+    private fun handleError(type: ConnectionErrorType,
+                            error: Exception? = null,
+                            response: Response? = null,
+                            responseModel: ResponseModel? = null,
+                            executionId: ExecutionId,
+                            callListener: (ConnectionErrorListener) -> Unit) {
         // エラーログ出力
         if (isLogEnabled) {
             val message = error?.toString() ?: ""
@@ -259,7 +269,7 @@ open class Connection<ResponseModel: Any> {
         }
 
         callback {
-            errorProcess(type, error, response, responseModel, callListener)
+            errorProcess(type, error, response, responseModel, executionId, callListener)
         }
     }
 
@@ -271,35 +281,13 @@ open class Connection<ResponseModel: Any> {
                              error: Exception? = null,
                              response: Response? = null,
                              responseModel: ResponseModel? = null,
-                             callListener: (ConnectionErrorListener) -> EventChain) {
-        var stopNext = false
-
-        for (i in errorListeners.indices) {
-            val result = callListener(errorListeners[i])
-            if (result == EventChain.stopImmediately) {
-                return
-            }
-            if (result == EventChain.stop) {
-                stopNext = true
-            }
+                             executionId: ExecutionId,
+                             callListener: (ConnectionErrorListener) -> Unit) {
+        errorListeners.forEach {
+            callListener(it)
+            if (executionId != this.executionId) { return }
         }
 
-        if (stopNext) {
-            return
-        }
-
-        afterError(type, error = error, response = response, responseModel = responseModel)
-    }
-
-    /**
-     * エラー後の処理
-     */
-    open fun afterError(
-        type: ConnectionErrorType,
-        error: Exception? = null,
-        response: Response? = null,
-        responseModel: ResponseModel? = null) {
-        
         val connectionError = ConnectionError(type = type, nativeError = error)
         errorListeners.forEach {
             it.afterError(
@@ -313,10 +301,10 @@ open class Connection<ResponseModel: Any> {
         end(response = response, responseModel = responseModel, error = connectionError)
     }
 
-
     private fun end(response: Response?, responseModel: Any?, error: ConnectionError?) {
-        listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
         holder.remove(connection = this)
+        executionId = null
+        listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
     }
     
     /**
@@ -343,13 +331,19 @@ open class Connection<ResponseModel: Any> {
      * 通信をキャンセルする
      */
     open fun cancel() {
-        // TODO 既に通信コールバックが走っている場合何もしない。通信コールバック内でキャンセルした場合に、onEndが二重で呼ばれないようにする必要がある
-        isCancelled = true
-        httpConnector.cancel()
+        // 既に実行完了している場合何もしない
+        val executionId = this.executionId ?: return
 
-        errorListeners.forEach { it.onCanceled(connection = this) }
-        val error = ConnectionError(type = ConnectionErrorType.canceled, nativeError = null)
-        end(response = null, responseModel = null, error = error)
+        onCancel(executionId)
+        httpConnector.cancel()
+    }
+
+    /**
+     * コールバック処理の実行を中断する
+     */
+    open fun interrupt() {
+        executionId = null
+        holder.remove(connection = this)
     }
 
     open fun callback(function: () -> Unit) {
@@ -374,3 +368,5 @@ open class Connection<ResponseModel: Any> {
         return URL(urlStr)
     }
 }
+
+class ExecutionId()

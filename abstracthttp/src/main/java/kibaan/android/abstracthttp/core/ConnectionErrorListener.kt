@@ -2,7 +2,6 @@ package kibaan.android.abstracthttp.core
 
 import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Response
-import kibaan.android.abstracthttp.enumtype.EventChain
 import kotlin.Exception
 
 /**
@@ -18,7 +17,7 @@ interface ConnectionErrorListener {
      * @param connection 通信オブジェクト
      * @param error エラー情報
      */
-    fun onNetworkError(connection: Connection<*>, error: Exception?): EventChain
+    fun onNetworkError(connection: Connection<*>, error: Exception?)
 
     /**
      * レスポンス内容のパース前のバリデーションエラー時に呼ばれる。
@@ -27,7 +26,7 @@ interface ConnectionErrorListener {
      * @param connection 通信オブジェクト
      * @param response HTTPレスポンスの情報
      */
-    fun onResponseError(connection: Connection<*>, response: Response): EventChain
+    fun onResponseError(connection: Connection<*>, response: Response)
 
     /**
      * パースエラー時に呼ばれる
@@ -36,7 +35,7 @@ interface ConnectionErrorListener {
      * @param response HTTPレスポンスの情報
      * @param error エラー情報
      */
-    fun onParseError(connection: Connection<*>, response: Response, error: Exception): EventChain
+    fun onParseError(connection: Connection<*>, response: Response, error: Exception)
 
     /**
      * レスポンスモデルのバリデーションエラー時に呼ばれる。
@@ -46,7 +45,7 @@ interface ConnectionErrorListener {
      * @param response HTTPレスポンスの情報
      * @param responseModel パースされたレスポンスデータモデル
      */
-    fun onValidationError(connection: Connection<*>, response: Response, responseModel: Any): EventChain
+    fun onValidationError(connection: Connection<*>, response: Response, responseModel: Any)
 
     /**
      * Connection.startの引数に渡したエラーコールバックの実行直後に呼ばれる

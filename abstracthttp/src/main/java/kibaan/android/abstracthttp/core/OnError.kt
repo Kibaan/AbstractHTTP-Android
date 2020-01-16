@@ -4,8 +4,6 @@ import kibaan.android.abstracthttp.entity.ConnectionError
 import kibaan.android.abstracthttp.entity.Response
 import kibaan.android.abstracthttp.enumtype.ConnectionErrorType
 import kibaan.android.abstracthttp.enumtype.ConnectionErrorType.*
-import kibaan.android.abstracthttp.enumtype.EventChain
-import kibaan.android.abstracthttp.enumtype.EventChain.*
 
 
 /**
@@ -18,24 +16,20 @@ class OnError<ResponseModel>: ConnectionErrorListener {
         this.onError = onError
     }
 
-    override fun onNetworkError(connection: Connection<*>, error: Exception?) : EventChain {
+    override fun onNetworkError(connection: Connection<*>, error: Exception?) {
         callError(type = network, nativeError = error)
-        return proceed
     }
 
-    override fun onResponseError(connection: Connection<*>, response: Response) : EventChain {
+    override fun onResponseError(connection: Connection<*>, response: Response) {
         callError(type = invalidResponse, response = response)
-        return proceed
     }
 
-    override fun onParseError(connection: Connection<*>, response: Response, error: Exception) : EventChain {
+    override fun onParseError(connection: Connection<*>, response: Response, error: Exception) {
         callError(type = parse, nativeError = error, response = response)
-        return proceed
     }
 
-    override fun onValidationError(connection: Connection<*>, response: Response, responseModel: Any) : EventChain {
+    override fun onValidationError(connection: Connection<*>, response: Response, responseModel: Any) {
         callError(type = validation, response = response, responseModel = responseModel)
-        return proceed
     }
 
     override fun onCanceled(connection: Connection<*>) {
