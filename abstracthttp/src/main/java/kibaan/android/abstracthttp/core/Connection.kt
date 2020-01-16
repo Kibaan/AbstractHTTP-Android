@@ -42,6 +42,9 @@ open class Connection<ResponseModel: Any> {
      */
     var callbackInMainThread = true
 
+    /**
+     * 通信成功時のコールバック
+     */
     var onSuccess: ((ResponseModel) -> Unit)? = null
 
     /**
