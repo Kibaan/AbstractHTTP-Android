@@ -62,6 +62,10 @@ open class Connection<ResponseModel: Any> {
     var executionId: ExecutionId? = null
         private set
 
+    /** 中断中の実行ID */
+    var interruptedId: ExecutionId? = null
+        private set
+
     constructor(requestSpec: RequestSpec, responseSpec: ResponseSpec<ResponseModel>, onSuccess: ((ResponseModel) -> Unit)? = null) {
         this.requestSpec = requestSpec
         this.parseResponse = responseSpec::parseResponse
@@ -119,8 +123,25 @@ open class Connection<ResponseModel: Any> {
      * コールバック処理の実行を中断する
      */
     open fun interrupt() {
+        interruptedId = executionId
         executionId = null
         holder.remove(connection = this)
+    }
+
+
+    /**
+     * `interrupt()`による中断を終了する
+     * キャンセル扱いになり、キャンセル時と同じコールバックが呼ばれる
+     */
+    open fun breakInterruption() {
+        val interruptedId = interruptedId
+        if (executionId != null || interruptedId == null) {
+            return
+        }
+
+        this.executionId = interruptedId
+        this.interruptedId = null
+        onCancel(executionId = interruptedId)
     }
 
     /**
@@ -131,6 +152,7 @@ open class Connection<ResponseModel: Any> {
     private fun connect(request: Request? = null, implicitly: Boolean = true) {
         val executionId = ExecutionId()
         this.executionId = executionId
+        this.interruptedId = null
 
         val url = makeURL(baseURL = requestSpec.url, query = requestSpec.urlQuery, encoder = urlEncoder)
         if (url == null) {
