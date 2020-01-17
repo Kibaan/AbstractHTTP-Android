@@ -164,7 +164,7 @@ open class Connection<ResponseModel: Any> {
         val request = request ?: Request(
             url = url,
             method = requestSpec.httpMethod,
-            body = requestSpec.makePostData(),
+            body = requestSpec.makeBody(),
             headers = requestSpec.headers.toMutableMap()
         )
 

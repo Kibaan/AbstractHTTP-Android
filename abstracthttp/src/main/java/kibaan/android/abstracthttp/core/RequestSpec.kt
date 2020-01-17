@@ -21,7 +21,7 @@ interface RequestSpec {
     val urlQuery: URLQuery?
 
     /**
-     * POSTデータを作成する
+     * リクエストボディを作成する
      */
-    fun makePostData(): ByteArray?
+    fun makeBody(): ByteArray?
 }

@@ -29,7 +29,7 @@ class SimplestSpec : ConnectionSpec<String> {
         get() = null
 
     // ポストするデータ（リクエストボディ）。不要な場合はnil。
-    override fun makePostData(): ByteArray? {
+    override fun makeBody(): ByteArray? {
         return null
     }
 
