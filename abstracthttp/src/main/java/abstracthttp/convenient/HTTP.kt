@@ -7,7 +7,6 @@ import abstracthttp.entity.Response
 import abstracthttp.entity.URLQuery
 import abstracthttp.enumtype.HTTPMethod
 import java.nio.charset.Charset
-import kotlin.reflect.KClass
 
 
 /// HTTP通信の簡易インターフェース
