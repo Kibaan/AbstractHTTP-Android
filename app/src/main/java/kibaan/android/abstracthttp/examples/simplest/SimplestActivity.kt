@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import kibaan.android.abstracthttp.examples.R
 import kibaan.android.abstracthttp.ExampleItem
-import kibaan.android.abstracthttp.core.Connection
+import abstracthttp.core.Connection
 
 class SimplestViewController : FragmentActivity(), ExampleItem {
     override val displayTitle: String

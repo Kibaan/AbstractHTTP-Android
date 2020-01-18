@@ -1,9 +1,9 @@
 package kibaan.android.abstracthttp.examples.simplest
 
-import kibaan.android.abstracthttp.core.ConnectionSpec
-import kibaan.android.abstracthttp.entity.Response
-import kibaan.android.abstracthttp.entity.URLQuery
-import kibaan.android.abstracthttp.enumtype.HTTPMethod
+import abstracthttp.core.ConnectionSpec
+import abstracthttp.entity.Response
+import abstracthttp.entity.URLQuery
+import abstracthttp.enumtype.HTTPMethod
 
 /**
  * 最小構成のConnectionSpec実装
