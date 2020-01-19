@@ -91,10 +91,9 @@ open class Connection<ResponseModel: Any> {
     /**
      * 通信を再実行する
      *
-     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
      */
-    open fun restart(implicitly: Boolean) {
-        connect(implicitly = implicitly)
+    open fun restart() {
+        connect()
     }
 
     /**
@@ -102,10 +101,9 @@ open class Connection<ResponseModel: Any> {
      * `restart` に近いふるまいになるが、リクエスト内容を再構築するか直近と全く同じリクエスト内容を使うかが異なる。
      * 例えばリクエストパラメーターに現在時刻を動的に含める場合、`repeatRequest` では前回リクエストと同時刻になるが `restart` では新しい時刻が設定される。
      *
-     * @args implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
      */
-    open fun repeatRequest(implicitly: Boolean) {
-        connect(request = latestRequest, implicitly = implicitly)
+    open fun repeatRequest() {
+        connect(request = latestRequest)
     }
 
     /**
@@ -147,9 +145,9 @@ open class Connection<ResponseModel: Any> {
     /**
      * 通信処理を開始する
      *
-     * @param implicitly 通信開始のコールバックを呼ばずに再通信する場合は `true` を指定する。
      */
-    private fun connect(request: Request? = null, implicitly: Boolean = true) {
+    private fun connect(request: Request? = null) {
+        val callOnStart = (this.executionId == null && interruptedId == null)
         val executionId = ExecutionId()
         this.executionId = executionId
         this.interruptedId = null
@@ -168,7 +166,7 @@ open class Connection<ResponseModel: Any> {
             headers = requestSpec.headers.toMutableMap()
         )
 
-        if (!implicitly) {
+        if (callOnStart) {
             listeners.forEach {
                 it.onStart(connection = this, request = request)
             }
