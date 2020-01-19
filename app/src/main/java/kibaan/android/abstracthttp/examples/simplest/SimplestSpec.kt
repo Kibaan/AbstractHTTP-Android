@@ -34,7 +34,7 @@ class SimplestSpec : ConnectionSpec<String> {
     }
 
     // ステータスコードの正常判定
-    override fun isValidResponse(response: Response): Boolean {
+    override fun validate(response: Response): Boolean {
         return true
     }
 

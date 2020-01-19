@@ -19,7 +19,7 @@ open class Connection<ResponseModel: Any> {
     var requestSpec: RequestSpec
 
     /** レスポンスデータの正当性を検証する */
-    var isValidResponse: (Response) -> Boolean
+    var validate: (Response) -> Boolean
 
     /** 通信レスポンスをデータモデルに変換する */
     var parseResponse: (Response) -> ResponseModel
@@ -69,14 +69,14 @@ open class Connection<ResponseModel: Any> {
     constructor(requestSpec: RequestSpec, responseSpec: ResponseSpec<ResponseModel>, onSuccess: ((ResponseModel) -> Unit)? = null) {
         this.requestSpec = requestSpec
         this.parseResponse = responseSpec::parseResponse
-        this.isValidResponse = responseSpec::isValidResponse
+        this.validate = responseSpec::validate
         this.onSuccess = onSuccess
     }
 
     constructor(connectionSpec: ConnectionSpec<ResponseModel>, onSuccess: ((ResponseModel) -> Unit)? = null) {
         this.requestSpec = connectionSpec
         this.parseResponse = connectionSpec::parseResponse
-        this.isValidResponse = connectionSpec::isValidResponse
+        this.validate = connectionSpec::validate
         this.onSuccess = onSuccess
     }
 
@@ -208,7 +208,7 @@ open class Connection<ResponseModel: Any> {
             if (executionId != this.executionId) { return }
         }
 
-        if (!listenerResult || !isValidResponse(response)) {
+        if (!listenerResult || !validate(response)) {
             onResponseError(response = response, executionId = executionId)
             return
         }

@@ -19,7 +19,7 @@ class HTTP {
     var headers: Map<String, String> = mapOf()
     var urlQuery: URLQuery? = null
     var body: ByteArray? = null
-    var isValidResponse: ((Response) -> Boolean)? = null
+    var validate: ((Response) -> Boolean)? = null
 
     var listeners: MutableList<ConnectionListener> = mutableListOf()
     var responseListeners: MutableList<ConnectionResponseListener> = mutableListOf()
@@ -57,8 +57,8 @@ class HTTP {
         return this
     }
 
-    fun isValidResponse(isValidResponse: (Response) -> Boolean) : HTTP {
-        this.isValidResponse = isValidResponse
+    fun validate(validate: (Response) -> Boolean) : HTTP {
+        this.validate = validate
         return this
     }
 
@@ -132,7 +132,7 @@ class HTTP {
     }
 
     private fun <T: Any> start(parse: (Response) -> T, callback: (T) -> Unit) : Connection<T> {
-        val spec = CustomConnectionSpec(url = url, httpMethod = httpMethod, headers = headers, urlQuery = urlQuery, body = body, isValidResponse = isValidResponse, parse = parse)
+        val spec = CustomConnectionSpec(url = url, httpMethod = httpMethod, headers = headers, urlQuery = urlQuery, body = body, validate = validate, parse = parse)
         val connection = Connection(spec, onSuccess = callback)
         listeners.forEach { connection.addListener(it) }
         responseListeners.forEach { connection.addResponseListener(it) }

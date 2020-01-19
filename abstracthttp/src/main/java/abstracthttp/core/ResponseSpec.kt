@@ -17,7 +17,7 @@ interface ResponseSpec<ResponseModel> {
      * @param response HTTPのレスポンス情報
      * @return レスポンスデータが正常の場合 `true`、エラーの場合 `false`
      */
-    fun isValidResponse(response: Response): Boolean
+    fun validate(response: Response): Boolean
 
     /**
      * HTTPレスポンスをassociated typeに指定した型に変換する

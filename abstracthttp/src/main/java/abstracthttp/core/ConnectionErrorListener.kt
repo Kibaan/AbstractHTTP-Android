@@ -2,7 +2,6 @@ package abstracthttp.core
 
 import abstracthttp.entity.ConnectionError
 import abstracthttp.entity.Response
-import kotlin.Exception
 
 /**
  * 通信エラーを受け取るリスナー。
@@ -21,7 +20,7 @@ interface ConnectionErrorListener {
 
     /**
      * レスポンス内容のパース前のバリデーションエラー時に呼ばれる。
-     * 具体的には、ResponseSpec.isValidResponse で `false` が返却された場合に呼ばれる
+     * 具体的には、ResponseSpec.validate で `false` が返却された場合に呼ばれる
      *
      * @param connection 通信オブジェクト
      * @param response HTTPレスポンスの情報
