@@ -19,9 +19,6 @@ interface RequestSpec {
     val headers: Map<String, String>
     /** URLに付与するクエリパラメーター */
     val urlQuery: URLQuery?
-
-    /**
-     * リクエストボディを作成する
-     */
-    fun makeBody(): ByteArray?
+    /** リクエストボディ */
+    val body: ByteArray?
 }

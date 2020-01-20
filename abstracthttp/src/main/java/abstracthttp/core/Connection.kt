@@ -162,7 +162,7 @@ open class Connection<ResponseModel: Any> {
         val request = request ?: Request(
             url = url,
             method = requestSpec.httpMethod,
-            body = requestSpec.makeBody(),
+            body = requestSpec.body,
             headers = requestSpec.headers.toMutableMap()
         )
 

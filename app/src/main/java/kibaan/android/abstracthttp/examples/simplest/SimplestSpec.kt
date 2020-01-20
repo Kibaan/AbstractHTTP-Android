@@ -29,9 +29,8 @@ class SimplestSpec : ConnectionSpec<String> {
         get() = null
 
     // ポストするデータ（リクエストボディ）。不要な場合はnil。
-    override fun makeBody(): ByteArray? {
-        return null
-    }
+    override val body: ByteArray?
+        get() = null
 
     // ステータスコードの正常判定
     override fun validate(response: Response): Boolean {

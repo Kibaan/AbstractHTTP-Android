@@ -12,8 +12,8 @@ class CustomConnectionSpec<T>: ConnectionSpec<T> {
     override val httpMethod: HTTPMethod
     override val headers: Map<String, String>
     override val urlQuery: URLQuery?
+    override val body: ByteArray?
 
-    val body: ByteArray?
     val validate: ((Response) -> Boolean)?
     val parse: (Response) -> T
 
@@ -33,9 +33,6 @@ class CustomConnectionSpec<T>: ConnectionSpec<T> {
         this.validate = validate
         this.parse = parse
     }
-
-    override fun makeBody() : ByteArray? =
-        body
 
     override fun validate(response: Response) : Boolean =
         validate?.invoke(response) ?: true
