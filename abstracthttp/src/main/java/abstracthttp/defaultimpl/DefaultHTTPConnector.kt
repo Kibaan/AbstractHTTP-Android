@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit
 
 /**
  * HTTP通信の標準実装
+ * TODO まだ精査できていない
+ *
  */
 class DefaultHTTPConnector : HTTPConnector {
 
@@ -78,14 +80,14 @@ class DefaultHTTPConnector : HTTPConnector {
     }
 
     private fun makeURLRequest(request: Request): okhttp3.Request {
-        val requestBuilder = okhttp3.Request.Builder().url(request.url).cacheControl(CacheControl.Builder().noCache().noStore().build())
-        if (request.method == HTTPMethod.post) {
+        val requestBuilder = okhttp3.Request.Builder()
+            .url(request.url).cacheControl(CacheControl.Builder().noCache().noStore().build())
+
+        if (request.body != null) {
             val headerContentType = request.headers.first { it.key.toLowerCase() == "content-type" }?.value
             val contentType = headerContentType ?: "application/octet-stream"
             val body = RequestBody.create(MediaType.parse(contentType), request.body)
             requestBuilder.post(body)
-        } else {
-            requestBuilder.get()
         }
 
         // ヘッダー付与
