@@ -87,6 +87,7 @@ class DefaultHTTPConnector : HTTPConnector {
             val headerContentType = request.headers.first { it.key.toLowerCase() == "content-type" }?.value
             val contentType = headerContentType ?: "application/octet-stream"
             val body = RequestBody.create(MediaType.parse(contentType), request.body)
+            // TODO 要修正！POST固定になっている
             requestBuilder.post(body)
         }
 
