@@ -34,8 +34,10 @@ class DefaultHTTPConnector : HTTPConnector {
     override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
         isCancelled = false
 
+        // TODO connectTimeoutではタイムアウトしない・・・
         val client = httpClient.newBuilder()
             .connectTimeout(timeoutInterval.toLong(), TimeUnit.SECONDS)
+            .readTimeout(timeoutInterval.toLong(), TimeUnit.SECONDS)
             .cookieJar(CookieJarImpl())
             .build()
 
