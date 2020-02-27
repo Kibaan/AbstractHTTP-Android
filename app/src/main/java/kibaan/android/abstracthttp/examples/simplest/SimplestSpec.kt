@@ -14,8 +14,7 @@ class SimplestSpec : ConnectionSpec<String> {
 
     // リクエスト先のURL
     override val url: String
-        get() = "https://altonotes.co.jp/md/coding_guideline.md"
-
+        get() = "https://reqres.in/api/users/2"
     // リクエストのHTTPメソッド
     override val httpMethod: HTTPMethod
         get() = HTTPMethod.get
@@ -37,6 +36,7 @@ class SimplestSpec : ConnectionSpec<String> {
         return true
     }
 
+    // 通信レスポンスをデータモデルに変換する
     override fun parseResponse(response: Response): String {
         return response.data.toString(Charsets.UTF_8)
     }

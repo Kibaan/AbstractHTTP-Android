@@ -6,7 +6,7 @@ import abstracthttp.entity.URLQuery
 import abstracthttp.enumtype.HTTPMethod
 
 
-class CustomConnectionSpec<T>: ConnectionSpec<T> {
+class CustomConnectionSpec<T> : ConnectionSpec<T> {
 
     override val url: String
     override val httpMethod: HTTPMethod
@@ -37,6 +37,6 @@ class CustomConnectionSpec<T>: ConnectionSpec<T> {
     override fun validate(response: Response) : Boolean =
         validate?.invoke(response) ?: true
 
-    override fun parseResponse(response: Response) : T =
+    override fun parseResponse(response: Response): T =
         parse(response)
 }
