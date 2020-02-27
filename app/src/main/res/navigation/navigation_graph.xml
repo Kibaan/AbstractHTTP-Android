@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="kibaan.android.abstracthttp.MainFragment"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_to_simplest"
+            app:destination="@id/simplestFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_get_json"
+            app:destination="@id/getJsonFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/simplestFragment"
+        android:name="kibaan.android.abstracthttp.examples.simplest.SimplestViewController"
+        tools:layout="@layout/fragment_simplest" />
+
+    <fragment
+        android:id="@+id/getJsonFragment"
+        android:name="kibaan.android.abstracthttp.examples.getjson.GetJSONFragment"
+        tools:layout="@layout/fragment_get_json" />
+
+</navigation>

@@ -9,15 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.entity.User
 import kibaan.android.abstracthttp.examples.R
 
-
-class GetJSONActivity : FragmentActivity(), ExampleItem {
+class GetJSONFragment : Fragment(), ExampleItem {
     override val displayTitle: String
         get() = "JSON取得"
 
@@ -32,19 +31,22 @@ class GetJSONActivity : FragmentActivity(), ExampleItem {
             recyclerView.adapter?.notifyDataSetChanged()
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_getjson)
-
-        findViewById<Button>(R.id.connectButton).setOnClickListener {
-            buttonAction(it)
-        }
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = RecyclerAdapter(this, response)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_get_json, container, false)
     }
 
-    private fun buttonAction(sender: Any) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        view.findViewById<Button>(R.id.connectButton).setOnClickListener {
+            buttonAction()
+        }
+        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = RecyclerAdapter(activity!!, response)
+    }
+
+    private fun buttonAction() {
         Connection(GetJSONSpec()) { response ->
             this.response = response
         }.start()
