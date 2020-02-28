@@ -29,17 +29,20 @@ class DefaultHTTPConnector : HTTPConnector {
     /** Cookieを有効にするか */
     var isCookieEnabled = true
 
+    /** 通信中の[HTTPTask] */
+    private var httpTask: HTTPTask? = null
+
     override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
         val config = HTTPConfig(
             timeout = (timeoutInterval * 1000.0).toInt(),
             instanceFollowRedirects = isRedirectEnabled,
             isCookieEnabled = isCookieEnabled
         )
-        HTTPTask(config, complete).execute(request)
+        httpTask = HTTPTask(config, complete).execute(request) as? HTTPTask
     }
 
     override fun cancel() {
-        // TODO キャンセル処理の実装
+        httpTask?.cancel(true)
     }
 
     class HTTPTask(
