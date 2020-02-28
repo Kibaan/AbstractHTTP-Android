@@ -8,6 +8,8 @@ import android.os.AsyncTask
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.CookieHandler
+import java.net.CookieManager
 import java.net.HttpURLConnection
 
 
@@ -28,7 +30,11 @@ class DefaultHTTPConnector : HTTPConnector {
     var isCookieEnabled = true
 
     override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
-        val config = HTTPConfig(connectTimeout = (timeoutInterval * 1000.0).toInt(), instanceFollowRedirects = isRedirectEnabled)
+        val config = HTTPConfig(
+            connectTimeout = (timeoutInterval * 1000.0).toInt(),
+            instanceFollowRedirects = isRedirectEnabled,
+            isCookieEnabled = isCookieEnabled
+        )
         HTTPTask(config, complete).execute(request)
     }
 
@@ -40,6 +46,12 @@ class DefaultHTTPConnector : HTTPConnector {
         private val config: HTTPConfig,
         private val complete: (Response?, Exception?) -> Unit
     ) : AsyncTask<Request, Void, Response?>() {
+
+        private val cookieManager by lazy {
+            val manager = CookieManager()
+            CookieHandler.setDefault(manager)
+            return@lazy manager
+        }
 
         override fun doInBackground(vararg requests: Request): Response? {
             return connect(request = requests.first())
@@ -75,8 +87,12 @@ class DefaultHTTPConnector : HTTPConnector {
                 } else {
                     connection.doOutput = false
                 }
+                connection.connect()
 
-                // 読み込み
+                // Cookieの保存
+                if (config.isCookieEnabled) {
+                    cookieManager.put(request.url.toURI(), connection.headerFields)
+                }
                 return makeResponse(connection, connection.inputStream)
             } catch (e1: IOException) {
                 if (connection == null) {
@@ -107,6 +123,10 @@ class DefaultHTTPConnector : HTTPConnector {
                     connection.addRequestProperty(key, headers[key])
                 }
             }
+            // Cookieの設定
+            if (config.isCookieEnabled && cookieManager.cookieStore.cookies.isNotEmpty()) {
+                connection.setRequestProperty("Cookie", cookieManager.cookieStore.cookies.joinToString(";"))
+            }
         }
 
         private fun getHeaderByConnection(connection: HttpURLConnection): Map<String, String> {
@@ -120,6 +140,7 @@ class DefaultHTTPConnector : HTTPConnector {
 
     data class HTTPConfig(
         val connectTimeout: Int,
-        val instanceFollowRedirects: Boolean
+        val instanceFollowRedirects: Boolean,
+        val isCookieEnabled: Boolean
     )
 }
