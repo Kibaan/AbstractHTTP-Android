@@ -73,6 +73,7 @@ class DefaultHTTPConnector : HTTPConnector {
                 // メソッド指定
                 connection.requestMethod = request.method.stringValue
                 // 自動的でリダイレクトするか
+                // TODO HttpからHttpsにリダイレクトする場合は自動的にリダレクトされないが許容するか？
                 connection.instanceFollowRedirects = config.instanceFollowRedirects
                 // 接続タイムアウト指定
                 connection.connectTimeout = config.connectTimeout
