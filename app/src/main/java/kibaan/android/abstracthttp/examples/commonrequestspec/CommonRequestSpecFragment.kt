@@ -2,27 +2,32 @@ package kibaan.android.abstracthttp.examples.commonrequestspec
 
 import abstracthttp.core.Connection
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.examples.R
-import kibaan.android.abstracthttp.examples.simplest.SimplestSpec
 
-class CommonRequestSpecActivity : FragmentActivity(), ExampleItem {
+class CommonRequestSpecFragment : Fragment(), ExampleItem {
 
     override val displayTitle: String
         get() = "リクエスト仕様の共通化"
 
     lateinit var textView: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_common_request_spec)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_common_request_spec, container, false)
+    }
 
-        textView = findViewById(R.id.textView)
-        findViewById<Button>(R.id.button1).setOnClickListener { button1Action() }
-        findViewById<Button>(R.id.button2).setOnClickListener { button2Action() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        textView = view.findViewById(R.id.textView)
+        view.findViewById<Button>(R.id.button1).setOnClickListener { button1Action() }
+        view.findViewById<Button>(R.id.button2).setOnClickListener { button2Action() }
     }
 
     override fun onResume() {

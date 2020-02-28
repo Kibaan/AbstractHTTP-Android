@@ -1,20 +1,22 @@
 package kibaan.android.abstracthttp.examples.indicator
 
-import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
-import kibaan.android.abstracthttp.examples.R
-import kibaan.android.abstracthttp.ExampleItem
 import abstracthttp.core.Connection
 import abstracthttp.defaultimpl.ConnectionIndicator
 import abstracthttp.defaultimpl.DefaultHTTPConnector
 import android.annotation.SuppressLint
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.commonspec.WaitableAPISpec
+import kibaan.android.abstracthttp.examples.R
 
-class IndicatorActivity : FragmentActivity(), ExampleItem {
+class IndicatorFragment : Fragment(), ExampleItem {
 
     override val displayTitle: String
         get() = "通信インジケーターの表示"
@@ -24,18 +26,21 @@ class IndicatorActivity : FragmentActivity(), ExampleItem {
 
     private lateinit var indicator: ConnectionIndicator
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_indicator)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_indicator, container, false)
+    }
 
-        indicatorView = findViewById(R.id.indicatorView)
-        textView = findViewById(R.id.textView)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        indicatorView = view.findViewById(R.id.indicatorView)
+        textView = view.findViewById(R.id.textView)
         indicator = ConnectionIndicator(view = indicatorView)
 
-        findViewById<Button>(R.id.singleButton).setOnClickListener { singleButtonAction() }
-        findViewById<Button>(R.id.errorButton).setOnClickListener { errorButtonAction() }
-        findViewById<Button>(R.id.sequencialButton).setOnClickListener { sequencialButtonAction() }
-        findViewById<Button>(R.id.parallelButton).setOnClickListener { parallelButtonAction() }
+        view.findViewById<Button>(R.id.singleButton).setOnClickListener { singleButtonAction() }
+        view.findViewById<Button>(R.id.errorButton).setOnClickListener { errorButtonAction() }
+        view.findViewById<Button>(R.id.sequencialButton).setOnClickListener { sequencialButtonAction() }
+        view.findViewById<Button>(R.id.parallelButton).setOnClickListener { parallelButtonAction() }
     }
 
     override fun onResume() {

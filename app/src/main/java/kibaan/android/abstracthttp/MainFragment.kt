@@ -18,11 +18,13 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.button1).setOnClickListener {
-            findNavController().navigate(R.id.action_to_simplest)
-        }
-        view.findViewById<Button>(R.id.button2).setOnClickListener {
-            findNavController().navigate(R.id.action_to_get_json)
-        }
+        view.findViewById<Button>(R.id.button1).setOnClickListener { findNavController().navigate(R.id.action_to_simplest) }
+        view.findViewById<Button>(R.id.button2).setOnClickListener { findNavController().navigate(R.id.action_to_get_json) }
+        view.findViewById<Button>(R.id.button3).setOnClickListener { findNavController().navigate(R.id.action_to_common_request_spec) }
+        view.findViewById<Button>(R.id.button4).setOnClickListener { findNavController().navigate(R.id.action_to_indicator) }
+        view.findViewById<Button>(R.id.button5).setOnClickListener { findNavController().navigate(R.id.action_to_listener) }
+//        view.findViewById<Button>(R.id.button6).setOnClickListener { findNavController().navigate(R.id.action_to_listener) }
+        view.findViewById<Button>(R.id.button7).setOnClickListener { findNavController().navigate(R.id.action_to_mock) }
+        view.findViewById<Button>(R.id.button8).setOnClickListener { findNavController().navigate(R.id.action_to_polling) }
     }
 }

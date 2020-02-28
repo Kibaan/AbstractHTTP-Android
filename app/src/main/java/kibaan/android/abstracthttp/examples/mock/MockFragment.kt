@@ -2,14 +2,17 @@ package kibaan.android.abstracthttp.examples.mock
 
 import abstracthttp.core.Connection
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.commonspec.SimpleGetSpec
 import kibaan.android.abstracthttp.examples.R
 
-class MockActivity : FragmentActivity(), ExampleItem {
+class MockFragment : Fragment(), ExampleItem {
 
     override val displayTitle: String
         get() = "通信処理のカスタマイズ・モック化"
@@ -18,12 +21,15 @@ class MockActivity : FragmentActivity(), ExampleItem {
 
     private val mockHTTPConnector = MockHTTPConnector()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_mock)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_mock, container, false)
+    }
 
-        textView = findViewById(R.id.textView)
-        findViewById<Button>(R.id.executeButton).setOnClickListener { executeButtonAction() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        textView = view.findViewById(R.id.textView)
+        view.findViewById<Button>(R.id.executeButton).setOnClickListener { executeButtonAction() }
     }
 
     override fun onResume() {

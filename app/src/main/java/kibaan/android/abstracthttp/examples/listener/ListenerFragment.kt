@@ -7,29 +7,35 @@ import abstracthttp.entity.Response
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.commonspec.WaitableAPISpec
 import kibaan.android.abstracthttp.examples.R
 
-class ListenerActivity : FragmentActivity(), ExampleItem {
+class ListenerFragment : Fragment(), ExampleItem {
 
     override val displayTitle: String
         get() = "各種リスナーのサンプル"
 
     lateinit var textView: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_listener)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_listener, container, false)
+    }
 
-        textView = findViewById(R.id.textView)
-        findViewById<Button>(R.id.successButton).setOnClickListener { successAction() }
-        findViewById<Button>(R.id.timeoutButton).setOnClickListener { timeoutAction() }
-        findViewById<Button>(R.id.cancelButton).setOnClickListener { cancelAction() }
-        findViewById<Button>(R.id.interruptButton).setOnClickListener { interruptAction() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        textView = view.findViewById(R.id.textView)
+        view.findViewById<Button>(R.id.successButton).setOnClickListener { successAction() }
+        view.findViewById<Button>(R.id.timeoutButton).setOnClickListener { timeoutAction() }
+        view.findViewById<Button>(R.id.cancelButton).setOnClickListener { cancelAction() }
+        view.findViewById<Button>(R.id.interruptButton).setOnClickListener { interruptAction() }
     }
 
     override fun onResume() {

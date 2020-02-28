@@ -20,6 +20,36 @@
             app:destination="@id/getJsonFragment"
             app:enterAnim="@anim/slide_from_right"
             app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_common_request_spec"
+            app:destination="@id/commonRequestSpecFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_indicator"
+            app:destination="@id/indicatorFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_listener"
+            app:destination="@id/listenerFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_mock"
+            app:destination="@id/mockFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_polling"
+            app:destination="@id/pollingFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
     </fragment>
 
     <fragment
@@ -31,5 +61,30 @@
         android:id="@+id/getJsonFragment"
         android:name="kibaan.android.abstracthttp.examples.getjson.GetJSONFragment"
         tools:layout="@layout/fragment_get_json" />
+
+    <fragment
+        android:id="@+id/commonRequestSpecFragment"
+        android:name="kibaan.android.abstracthttp.examples.commonrequestspec.CommonRequestSpecFragment"
+        tools:layout="@layout/fragment_common_request_spec" />
+
+    <fragment
+        android:id="@+id/indicatorFragment"
+        android:name="kibaan.android.abstracthttp.examples.indicator.IndicatorFragment"
+        tools:layout="@layout/fragment_indicator" />
+
+    <fragment
+        android:id="@+id/listenerFragment"
+        android:name="kibaan.android.abstracthttp.examples.listener.ListenerFragment"
+        tools:layout="@layout/fragment_listener" />
+
+    <fragment
+        android:id="@+id/mockFragment"
+        android:name="kibaan.android.abstracthttp.examples.mock.MockFragment"
+        tools:layout="@layout/fragment_mock" />
+
+    <fragment
+        android:id="@+id/pollingFragment"
+        android:name="kibaan.android.abstracthttp.examples.polling.PollingFragment"
+        tools:layout="@layout/fragment_polling" />
 
 </navigation>

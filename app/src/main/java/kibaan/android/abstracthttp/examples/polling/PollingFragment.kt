@@ -5,12 +5,11 @@ import abstracthttp.defaultimpl.Polling
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kibaan.android.abstracthttp.ExampleItem
@@ -20,8 +19,7 @@ import kibaan.android.abstracthttp.examples.R
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-class PollingViewController : FragmentActivity(), ExampleItem {
+class PollingFragment : Fragment(), ExampleItem {
 
     override val displayTitle: String
         get() = "ポーリング（自動更新）"
@@ -33,16 +31,19 @@ class PollingViewController : FragmentActivity(), ExampleItem {
         Polling(delaySeconds = 1, callback = ::request)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_polling)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_polling, container, false)
+    }
 
-        timeLabel = findViewById(R.id.timeLabel)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        timeLabel = view.findViewById(R.id.timeLabel)
         timeLabel.text = null
 
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = RecyclerAdapter(this, rateList = null)
+        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = RecyclerAdapter(activity!!, rateList = null)
     }
 
     override fun onResume() {
