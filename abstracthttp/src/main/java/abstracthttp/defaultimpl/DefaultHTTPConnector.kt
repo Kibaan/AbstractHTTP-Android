@@ -51,8 +51,11 @@ class DefaultHTTPConnector : HTTPConnector {
     ) : AsyncTask<Request, Void, Response?>() {
 
         private val cookieManager by lazy {
-            val manager = CookieManager()
-            CookieHandler.setDefault(manager)
+            var manager = CookieHandler.getDefault()
+            if (manager == null) {
+                manager = CookieManager()
+                CookieHandler.setDefault(manager)
+            }
             return@lazy manager
         }
 
@@ -127,10 +130,6 @@ class DefaultHTTPConnector : HTTPConnector {
                 } else {
                     connection.addRequestProperty(key, headers[key])
                 }
-            }
-            // Cookieの設定
-            if (config.isCookieEnabled && cookieManager.cookieStore.cookies.isNotEmpty()) {
-                connection.setRequestProperty("Cookie", cookieManager.cookieStore.cookies.joinToString(";"))
             }
         }
 
