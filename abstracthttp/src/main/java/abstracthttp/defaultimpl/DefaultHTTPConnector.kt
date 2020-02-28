@@ -21,7 +21,7 @@ import java.net.HttpURLConnection
 class DefaultHTTPConnector : HTTPConnector {
 
     /** データ転送のタイムアウト期間（秒）。この期間データ転送が中断するとタイムアウトする。 */
-    var timeoutInterval: Double = 1.0
+    var timeoutInterval: Double = 15.0
 
     /** 自動でリダイレクトするか */
     var isRedirectEnabled = true
@@ -31,7 +31,7 @@ class DefaultHTTPConnector : HTTPConnector {
 
     override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
         val config = HTTPConfig(
-            connectTimeout = (timeoutInterval * 1000.0).toInt(),
+            timeout = (timeoutInterval * 1000.0).toInt(),
             instanceFollowRedirects = isRedirectEnabled,
             isCookieEnabled = isCookieEnabled
         )
@@ -76,7 +76,8 @@ class DefaultHTTPConnector : HTTPConnector {
                 // TODO HttpからHttpsにリダイレクトする場合は自動的にリダレクトされないが許容するか？
                 connection.instanceFollowRedirects = config.instanceFollowRedirects
                 // 接続タイムアウト指定
-                connection.connectTimeout = config.connectTimeout
+                connection.connectTimeout = config.timeout
+                connection.readTimeout = config.timeout
                 // ヘッダー付与
                 setHeaderToConnection(connection, request.headers)
 
@@ -140,7 +141,7 @@ class DefaultHTTPConnector : HTTPConnector {
     }
 
     data class HTTPConfig(
-        val connectTimeout: Int,
+        val timeout: Int,
         val instanceFollowRedirects: Boolean,
         val isCookieEnabled: Boolean
     )
