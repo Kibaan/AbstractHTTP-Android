@@ -11,6 +11,7 @@ import java.io.OutputStream
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.HttpURLConnection
+import java.net.URL
 
 
 /**
@@ -35,7 +36,7 @@ class DefaultHTTPConnector : HTTPConnector {
     override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
         val config = HTTPConfig(
             timeout = (timeoutInterval * 1000.0).toInt(),
-            instanceFollowRedirects = isRedirectEnabled,
+            isRedirectEnabled = isRedirectEnabled,
             isCookieEnabled = isCookieEnabled
         )
         httpTask = HTTPTask(config, complete).execute(request) as? HTTPTask
@@ -78,9 +79,8 @@ class DefaultHTTPConnector : HTTPConnector {
 
                 // メソッド指定
                 connection.requestMethod = request.method.stringValue
-                // 自動的でリダイレクトするか
-                // TODO HttpからHttpsにリダイレクトする場合は自動的にリダレクトされないが許容するか？
-                connection.instanceFollowRedirects = config.instanceFollowRedirects
+                // 自動的でリダイレクトはしないように設定する（独自実装で制御）
+                connection.instanceFollowRedirects = false
                 // 接続タイムアウト指定
                 connection.connectTimeout = config.timeout
                 connection.readTimeout = config.timeout
@@ -101,7 +101,7 @@ class DefaultHTTPConnector : HTTPConnector {
                 if (config.isCookieEnabled) {
                     cookieManager.put(request.url.toURI(), connection.headerFields)
                 }
-                return makeResponse(connection, connection.inputStream)
+                return afterProcess(connection, request)
             } catch (e1: IOException) {
                 if (connection == null) {
                     throw e1
@@ -115,6 +115,16 @@ class DefaultHTTPConnector : HTTPConnector {
             } finally {
                 connection?.disconnect()
             }
+        }
+
+        private fun afterProcess(connection: HttpURLConnection, request: Request): Response? {
+            val statusCode = connection.responseCode
+            val location = connection.headerFields["Location"]?.firstOrNull()
+            if (config.isRedirectEnabled && statusCode.toString().startsWith("3") && location != null) {
+                val body = if (statusCode == 303) null else request.body
+                return connect(request = Request(url = URL(location), method = request.method, body = body, headers = request.headers))
+            }
+            return makeResponse(connection, connection.inputStream)
         }
 
         private fun makeResponse(connection: HttpURLConnection, inputStream: InputStream?): Response? {
@@ -144,7 +154,7 @@ class DefaultHTTPConnector : HTTPConnector {
 
     data class HTTPConfig(
         val timeout: Int,
-        val instanceFollowRedirects: Boolean,
+        val isRedirectEnabled: Boolean,
         val isCookieEnabled: Boolean
     )
 }
