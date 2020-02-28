@@ -3,9 +3,13 @@ package abstracthttp.defaultimpl
 import abstracthttp.core.HTTPConnector
 import abstracthttp.entity.Request
 import abstracthttp.entity.Response
-import okhttp3.*
+import abstracthttp.enumtype.HTTPMethod
+import android.os.AsyncTask
 import java.io.IOException
-import java.util.concurrent.TimeUnit
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.HttpURLConnection
+
 
 /**
  * HTTP通信の標準実装
@@ -14,173 +18,108 @@ import java.util.concurrent.TimeUnit
  */
 class DefaultHTTPConnector : HTTPConnector {
 
-    companion object {
-        val httpClient = OkHttpClient()
-    }
-
-    var httpCall: Call? = null
-
     /** データ転送のタイムアウト期間（秒）。この期間データ転送が中断するとタイムアウトする。 */
-    var timeoutInterval: Double = 15.0
+    var timeoutInterval: Double = 1.0
 
     /** 自動でリダイレクトするか */
     var isRedirectEnabled = true
 
-    /** キャッシュポリシー */
-//    public var cachePolicy: NSURLRequest.CachePolicy? = .reloadIgnoringCacheData
-
-    var isCancelled: Boolean = false
+    /** Cookieを有効にするか */
+    var isCookieEnabled = true
 
     override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
-        isCancelled = false
-
-        // TODO connectTimeoutではタイムアウトしない・・・
-        val client = httpClient.newBuilder()
-            .connectTimeout(timeoutInterval.toLong(), TimeUnit.SECONDS)
-            .readTimeout(timeoutInterval.toLong(), TimeUnit.SECONDS)
-            .cookieJar(CookieJarImpl())
-            .build()
-
-        val httpCall = client.newCall(makeURLRequest(request))
-        this.httpCall = httpCall
-
-        httpCall.enqueue(object : Callback {
-            override fun onResponse(call: Call, response: okhttp3.Response) {
-                val response = makeResponse(response = response, data = response.body()?.bytes())
-                complete(response, null)
-                this@DefaultHTTPConnector.httpCall = null
-            }
-
-            override fun onFailure(call: Call, e: IOException) {
-                complete(null, e)
-                this@DefaultHTTPConnector.httpCall = null
-            }
-        })
+        val config = HTTPConfig(connectTimeout = (timeoutInterval * 1000.0).toInt(), instanceFollowRedirects = isRedirectEnabled)
+        HTTPTask(config, complete).execute(request)
     }
 
     override fun cancel() {
-        httpCall?.cancel()
-        isCancelled = true
+        // TODO キャンセル処理の実装
     }
 
-    private fun makeResponse(response: okhttp3.Response?, data: ByteArray?): Response? {
-        val response = response ?: return null
-        val headers: Map<String, String> = mapOf()
-        val responseHeaders = response.headers()
-        val allHeaderFields = mutableMapOf<String, String>()
-        responseHeaders.names().forEach {
-            val headerValue = responseHeaders[it] ?: return@forEach
-            allHeaderFields[it] = headerValue
-        }
-        return Response(data = data ?: ByteArray(0), statusCode = response.code(), headers = headers, nativeResponse = response)
-    }
+    class HTTPTask(
+        private val config: HTTPConfig,
+        private val complete: (Response?, Exception?) -> Unit
+    ) : AsyncTask<Request, Void, Response?>() {
 
-    private fun makeURLRequest(request: Request): okhttp3.Request {
-        val requestBuilder = okhttp3.Request.Builder()
-            .url(request.url).cacheControl(CacheControl.Builder().noCache().noStore().build())
-        val headerContentType = request.headers.filter { it.key.toLowerCase() == "content-type" }.values.firstOrNull()
-        val contentType = headerContentType ?: "application/octet-stream"
-        var requestBody: RequestBody? = null
-        if (request.body != null) {
-            requestBody = RequestBody.create(MediaType.parse(contentType), request.body)
-        }
-        requestBuilder.method(request.method.stringValue, requestBody)
-
-        // ヘッダー付与
-        request.headers.forEach {
-            requestBuilder.addHeader(it.key, it.value)
-        }
-        return requestBuilder.build()
-    }
-
-    // region -> CookieJar
-
-    private class CookieJarImpl : CookieJar {
-
-        override fun saveFromResponse(url: HttpUrl, cookies: MutableList<Cookie>) {
-            HTTPCookieStorage.shared.setCookies(url, cookies)
+        override fun doInBackground(vararg requests: Request): Response? {
+            return connect(request = requests.first())
         }
 
-        override fun loadForRequest(url: HttpUrl): MutableList<Cookie> {
-            return HTTPCookieStorage.shared.getCookies(url).toMutableList()
+        override fun onPostExecute(result: Response?) {
+            super.onPostExecute(result)
+            complete.invoke(result, null)
         }
-    }
 
-    // endregion
+        private fun connect(request: Request): Response? {
+            var connection: HttpURLConnection? = null
+            val outputStream: OutputStream?
 
-    // region -> HTTPCookieStorage
+            try {
+                // 接続
+                connection = request.url.openConnection() as HttpURLConnection
 
-    class HTTPCookieStorage {
+                // メソッド指定
+                connection.requestMethod = request.method.stringValue
+                // 自動的でリダイレクトするか
+                connection.instanceFollowRedirects = config.instanceFollowRedirects
+                // 接続タイムアウト指定
+                connection.connectTimeout = config.connectTimeout
+                // ヘッダー付与
+                setHeaderToConnection(connection, request.headers)
 
-        companion object {
-            private var instance: HTTPCookieStorage? = null
-            val shared: HTTPCookieStorage
-                get() {
-                    var instance = this.instance
-                    if (instance != null) {
-                        return instance
-                    }
-                    instance = HTTPCookieStorage()
-                    this.instance = instance
-                    return instance
+                // リクエストボディの設定
+                if (request.body != null && request.method == HTTPMethod.post) {
+                    connection.doOutput = true
+                    outputStream = connection.outputStream
+                    outputStream.write(request.body)
+                } else {
+                    connection.doOutput = false
                 }
 
-        }
-
-        // endregion
-
-        // region -> Variables
-
-        private var cookieMap: MutableMap<String, MutableList<Cookie>> = mutableMapOf()
-
-        // endregion
-
-        // region -> Function
-
-        @Synchronized
-        fun setCookies(url: HttpUrl, cookies: MutableList<Cookie>) {
-            val targetList = cookieMap[url.host()] ?: mutableListOf()
-            cookies.forEach { cookie ->
-                targetList.removeAll { it.keyEquals(cookie) }
-            }
-            targetList.addAll(cookies)
-            cookieMap[url.host()] = targetList
-        }
-
-        @Synchronized
-        fun getCookies(url: HttpUrl): List<Cookie> {
-            val host = url.host()
-            removeExpiredCookies(host)
-
-            val path = url.encodedPath()
-            val targetList = cookieMap[host] ?: return mutableListOf()
-
-            return targetList.filter {
-                path.startsWith(it.path()) && it.domain() == host
+                // 読み込み
+                return makeResponse(connection, connection.inputStream)
+            } catch (e1: IOException) {
+                if (connection == null) {
+                    throw e1
+                }
+                try {
+                    // 404などの場合Exceptionが発生してもレスポンスがあるので読み取り
+                    return makeResponse(connection, connection.errorStream)
+                } catch (e2: IOException) {
+                    throw e2
+                }
+            } finally {
+                connection?.disconnect()
             }
         }
 
-        @Suppress("MemberVisibilityCanBePrivate")
-        private fun removeExpiredCookies(host: String) {
-            val targetList = cookieMap[host] ?: return
-            targetList.removeAll { it.hasExpired }
-            cookieMap[host] = targetList
+        private fun makeResponse(connection: HttpURLConnection, inputStream: InputStream?): Response? {
+            val responseData = inputStream?.readBytes() ?: return null
+            val headers = getHeaderByConnection(connection)
+            return Response(data = responseData, statusCode = connection.responseCode, headers = headers, nativeResponse = null)
         }
 
-        @Synchronized
-        fun clear() {
-            cookieMap.clear()
+        private fun setHeaderToConnection(connection: HttpURLConnection, headers: Map<String, String>) {
+            headers.keys.forEachIndexed { index, key ->
+                if (index == 0) {
+                    connection.setRequestProperty(key, headers[key])
+                } else {
+                    connection.addRequestProperty(key, headers[key])
+                }
+            }
         }
 
-        private val Cookie.hasExpired: Boolean
-            get() = expiresAt() < System.currentTimeMillis()
-
-        private fun Cookie.keyEquals(other: Any?): Boolean {
-            if (other !is Cookie) return false
-            val that = other as Cookie?
-            return that?.name() == name() && that?.domain() == domain() && that?.path() == path()
+        private fun getHeaderByConnection(connection: HttpURLConnection): Map<String, String> {
+            val headers = mutableMapOf<String, String>()
+            connection.headerFields.filter { it.key != null }.forEach {
+                headers[it.key] = it.value.joinToString(" ")
+            }
+            return headers
         }
     }
 
-    // endregion
+    data class HTTPConfig(
+        val connectTimeout: Int,
+        val instanceFollowRedirects: Boolean
+    )
 }
