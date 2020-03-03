@@ -142,8 +142,6 @@ class DefaultHTTPConnector : HTTPConnector {
             // リクエストボディの設定
             if (request.body != null) {
                 connection.doOutput = true
-
-                // TODO 一発で書き込みが本当に出来るか？JavaDocとか確認する
                 connection.outputStream.write(request.body)
             }
             return connection
