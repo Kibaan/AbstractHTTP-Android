@@ -3,7 +3,7 @@ package abstracthttp.defaultimpl
 import abstracthttp.core.HTTPConnector
 import abstracthttp.entity.Request
 import abstracthttp.entity.Response
-import android.util.Log
+import abstracthttp.enumtype.HTTPMethod
 import kotlinx.coroutines.*
 import java.io.IOException
 import java.io.InputStream
@@ -29,20 +29,11 @@ class DefaultHTTPConnector : HTTPConnector {
     /** Cookieを有効にするか */
     var isCookieEnabled = true
 
-    /** ログ出力するか */
-    var isLogEnabled = false
-
     /** 通信中の[HTTPTask] */
     private var httpTask: HTTPTask? = null
 
     override fun execute(request: Request, complete: (Response?, Exception?) -> Unit) {
-        val config = HTTPConfig(
-            timeout = (timeoutInterval * 1000.0).toInt(),
-            isRedirectEnabled = isRedirectEnabled,
-            isCookieEnabled = isCookieEnabled,
-            isLogEnabled = isLogEnabled
-        )
-        httpTask = HTTPTask(config, complete)
+        httpTask = HTTPTask(complete)
         httpTask?.execute(request)
     }
 
@@ -50,14 +41,15 @@ class DefaultHTTPConnector : HTTPConnector {
         httpTask?.cancel()
     }
 
-    class HTTPTask(private val config: HTTPConfig, private val complete: (Response?, Exception?) -> Unit) : CoroutineScope {
+    // TODO CoroutineScopeはHTTPTaskから切り出す
+    private inner class HTTPTask(
+        private val complete: (Response?, Exception?) -> Unit
+    ) : CoroutineScope {
 
-        private val logTag = javaClass.simpleName
-
-        private val job = Job()
+        private var job: Job? = null
 
         override val coroutineContext: CoroutineContext
-            get() = Dispatchers.Main + job
+            get() = Dispatchers.IO
 
         private val cookieManager by lazy {
             var manager = CookieHandler.getDefault()
@@ -69,19 +61,18 @@ class DefaultHTTPConnector : HTTPConnector {
         }
 
         fun execute(request: Request) {
-            launch(Dispatchers.IO) {
+            job = launch {
                 try {
                     val response = connect(request = request)
-                    onComplete(response, null)
+                    complete(response, null)
                 } catch (e: Exception) {
-                    onComplete(null, e)
+                    complete(null, e)
                 }
             }
         }
 
         fun cancel() {
-            job.cancel()
-            log("cancel.")
+            job?.cancel()
         }
 
         private fun connect(request: Request): Response? {
@@ -91,17 +82,21 @@ class DefaultHTTPConnector : HTTPConnector {
                 // 接続
                 connection = makeURLConnection(request)
                 connection.connect()
-                log("connect.")
+
+                // キャンセル済みの場合は以降の処理は実行しない
+                if (!isActive) return null
 
                 // Cookieの保存
-                if (config.isCookieEnabled) {
+                if (isCookieEnabled) {
                     cookieManager.put(request.url.toURI(), connection.headerFields)
                 }
                 // リダイレクト
                 val location = getRedirectLocation(connection)
                 if (location != null) {
-                    val body = if (connection.responseCode == 303) null else request.body
-                    return connect(request = Request(url = location, method = request.method, body = body, headers = request.headers))
+                    val isSeeOther = connection.responseCode == 303
+                    val body = if (isSeeOther) null else request.body
+                    val method = if (isSeeOther) HTTPMethod.get else request.method
+                    return connect(request = Request(url = location, method = method, body = body, headers = request.headers))
                 }
                 return makeResponse(connection, connection.inputStream)
             } catch (e1: IOException) {
@@ -114,14 +109,6 @@ class DefaultHTTPConnector : HTTPConnector {
                 }
             } finally {
                 connection?.disconnect()
-                log("disconnect.")
-            }
-        }
-
-        private fun onComplete(response: Response?, exception: Exception?) {
-            if (isActive) {
-                complete(response, exception)
-                log("complete.")
             }
         }
 
@@ -134,7 +121,7 @@ class DefaultHTTPConnector : HTTPConnector {
             connection.instanceFollowRedirects = false
             // 接続タイムアウト指定
             // TODO iOS版と動きが異なるので、要検討
-            connection.connectTimeout = config.timeout
+            connection.connectTimeout = (timeoutInterval * 1000.0).toInt()
             // ヘッダー付与
             request.headers.forEach {
                 connection.setRequestProperty(it.key, it.value)
@@ -150,7 +137,7 @@ class DefaultHTTPConnector : HTTPConnector {
         private fun getRedirectLocation(connection: HttpURLConnection): URL? {
             val statusCode = connection.responseCode
             val location = connection.headerFields["Location"]?.firstOrNull()
-            if (config.isRedirectEnabled && statusCode.toString().startsWith("3") && location != null) {
+            if (isRedirectEnabled && statusCode.toString().startsWith("3") && location != null) {
                 return URL(location)
             }
             return null
@@ -160,22 +147,9 @@ class DefaultHTTPConnector : HTTPConnector {
             val responseData = inputStream?.readBytes() ?: return null
             val headers = mutableMapOf<String, String>()
             connection.headerFields.filter { it.key != null }.forEach {
-                headers[it.key] = it.value.joinToString(" ")
+                headers[it.key] = it.value.joinToString(", ")
             }
             return Response(data = responseData, statusCode = connection.responseCode, headers = headers, nativeResponse = null)
         }
-
-        private fun log(message: String) {
-            if (config.isLogEnabled) {
-                Log.d(logTag, message)
-            }
-        }
     }
-
-    data class HTTPConfig(
-        val timeout: Int,
-        val isRedirectEnabled: Boolean,
-        val isCookieEnabled: Boolean,
-        val isLogEnabled: Boolean
-    )
 }
