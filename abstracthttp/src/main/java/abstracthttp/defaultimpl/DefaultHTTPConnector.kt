@@ -11,7 +11,6 @@ import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.HttpURLConnection
 import java.net.URL
-import kotlin.coroutines.CoroutineContext
 
 /**
  * HTTP通信の標準実装
@@ -41,15 +40,9 @@ class DefaultHTTPConnector : HTTPConnector {
         httpTask?.cancel()
     }
 
-    // TODO CoroutineScopeはHTTPTaskから切り出す
-    private inner class HTTPTask(
-        private val complete: (Response?, Exception?) -> Unit
-    ) : CoroutineScope {
+    private inner class HTTPTask(private val complete: (Response?, Exception?) -> Unit) {
 
         private var job: Job? = null
-
-        override val coroutineContext: CoroutineContext
-            get() = Dispatchers.IO
 
         private val cookieManager by lazy {
             var manager = CookieHandler.getDefault()
@@ -61,7 +54,7 @@ class DefaultHTTPConnector : HTTPConnector {
         }
 
         fun execute(request: Request) {
-            job = launch {
+            job = CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val response = connect(request = request)
                     complete(response, null)
@@ -84,7 +77,7 @@ class DefaultHTTPConnector : HTTPConnector {
                 connection.connect()
 
                 // キャンセル済みの場合は以降の処理は実行しない
-                if (!isActive) return null
+                if (job?.isCancelled == true) return null
 
                 // Cookieの保存
                 if (isCookieEnabled) {
