@@ -10,10 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
-import java.net.CookieHandler
-import java.net.CookieManager
-import java.net.HttpURLConnection
-import java.net.URL
+import java.net.*
 
 /**
  * HTTP通信の標準実装
@@ -21,6 +18,10 @@ import java.net.URL
  *
  */
 class DefaultHTTPConnector : HTTPConnector {
+
+    companion object {
+        val cookieManager: CookieManager = CookieManager()
+    }
 
     /** データ転送のタイムアウト期間（秒）。この期間データ転送が中断するとタイムアウトする。 */
     var timeoutInterval: Double = 15.0
@@ -46,15 +47,6 @@ class DefaultHTTPConnector : HTTPConnector {
     private inner class HTTPTask(private val complete: (Response?, Exception?) -> Unit) {
 
         private var job: Job? = null
-
-        private val cookieManager by lazy {
-            var manager = CookieHandler.getDefault()
-            if (manager == null) {
-                manager = CookieManager()
-                CookieHandler.setDefault(manager)
-            }
-            return@lazy manager
-        }
 
         fun execute(request: Request) {
             job = CoroutineScope(Dispatchers.IO).launch {
@@ -117,15 +109,23 @@ class DefaultHTTPConnector : HTTPConnector {
             // 自動的でリダイレクトはしないように設定する（独自実装で制御）
             connection.instanceFollowRedirects = false
             // 接続タイムアウト指定
-            // TODO iOS版と動きが異なるので、要検討
             connection.connectTimeout = timeoutInterval.toInt() * 1000
             connection.readTimeout = timeoutInterval.toInt() * 1000
             // ヘッダー付与
             request.headers.forEach {
                 connection.setRequestProperty(it.key, it.value)
             }
+            // クッキー付与
+            cookieManager.cookieStore.get(request.url.toURI()).forEach {
+                connection.setRequestProperty("Cookie", it.toString())
+            }
             // リクエストボディの設定
             if (request.body != null) {
+                // Content-Typeがない場合にデフォルト値を設定
+                val headerContentType = request.headers.keys.firstOrNull { it.toLowerCase() == "content-type" }
+                if (headerContentType == null) {
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+                }
                 connection.doOutput = true
                 connection.outputStream.write(request.body)
             }
