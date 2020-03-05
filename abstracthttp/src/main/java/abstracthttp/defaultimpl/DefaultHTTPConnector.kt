@@ -4,7 +4,10 @@ import abstracthttp.core.HTTPConnector
 import abstracthttp.entity.Request
 import abstracthttp.entity.Response
 import abstracthttp.enumtype.HTTPMethod
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
 import java.net.CookieHandler
@@ -70,6 +73,7 @@ class DefaultHTTPConnector : HTTPConnector {
 
         private fun connect(request: Request): Response? {
             var connection: HttpURLConnection? = null
+            var headerFields: Map<String?, List<String>>? = null
 
             try {
                 // 接続
@@ -77,11 +81,14 @@ class DefaultHTTPConnector : HTTPConnector {
                 connection.connect()
 
                 // キャンセル済みの場合は以降の処理は実行しない
-                if (job?.isCancelled == true) return null
+                if (job?.isCancelled == true) throw IOException("The connection is cancelled by program.")
+
+                // ヘッダーの取得
+                headerFields = connection.headerFields
 
                 // Cookieの保存
                 if (isCookieEnabled) {
-                    cookieManager.put(request.url.toURI(), connection.headerFields)
+                    cookieManager.put(request.url.toURI(), headerFields)
                 }
                 // リダイレクト
                 val location = getRedirectLocation(connection)
@@ -91,15 +98,12 @@ class DefaultHTTPConnector : HTTPConnector {
                     val method = if (isSeeOther) HTTPMethod.get else request.method
                     return connect(request = Request(url = location, method = method, body = body, headers = request.headers))
                 }
-                return makeResponse(connection, connection.inputStream)
-            } catch (e1: IOException) {
-                if (connection == null) throw e1
-                try {
-                    // 404などの場合Exceptionが発生してもレスポンスがあるので読み取り
-                    return makeResponse(connection, connection.errorStream)
-                } catch (e2: IOException) {
-                    throw e2
-                }
+                return makeResponse(connection.responseCode, headerFields, connection.inputStream)
+            } catch (e: IOException) {
+                if (connection == null) throw e
+
+                // 404などの場合Exceptionが発生してもレスポンスがあるので読み取り
+                return makeResponse(connection.responseCode, headerFields, connection.errorStream) ?: throw e
             } finally {
                 connection?.disconnect()
             }
@@ -114,7 +118,8 @@ class DefaultHTTPConnector : HTTPConnector {
             connection.instanceFollowRedirects = false
             // 接続タイムアウト指定
             // TODO iOS版と動きが異なるので、要検討
-            connection.connectTimeout = (timeoutInterval * 1000.0).toInt()
+            connection.connectTimeout = timeoutInterval.toInt() * 1000
+            connection.readTimeout = timeoutInterval.toInt() * 1000
             // ヘッダー付与
             request.headers.forEach {
                 connection.setRequestProperty(it.key, it.value)
@@ -136,13 +141,15 @@ class DefaultHTTPConnector : HTTPConnector {
             return null
         }
 
-        private fun makeResponse(connection: HttpURLConnection, inputStream: InputStream?): Response? {
+        private fun makeResponse(statusCode: Int, headerFields: Map<String?, List<String>>?, inputStream: InputStream?): Response? {
+            val headerFields = headerFields ?: return null
             val responseData = inputStream?.readBytes() ?: return null
             val headers = mutableMapOf<String, String>()
-            connection.headerFields.filter { it.key != null }.forEach {
-                headers[it.key] = it.value.joinToString(", ")
+            headerFields.filter { it.key != null }.forEach {
+                val key = it.key ?: return@forEach
+                headers[key] = it.value.joinToString(", ")
             }
-            return Response(data = responseData, statusCode = connection.responseCode, headers = headers, nativeResponse = null)
+            return Response(data = responseData, statusCode = statusCode, headers = headers, nativeResponse = null)
         }
     }
 }
