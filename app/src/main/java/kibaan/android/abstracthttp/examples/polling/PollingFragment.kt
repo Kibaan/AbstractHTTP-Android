@@ -17,6 +17,7 @@ import kibaan.android.abstracthttp.commonspec.FXRateListAPI
 import kibaan.android.abstracthttp.examples.R
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.schedule
 
 class PollingFragment : Fragment() {
 
@@ -55,7 +56,9 @@ class PollingFragment : Fragment() {
     private fun request() {
         Connection(FXRateListAPI()) { response ->
             this.update(rateList = response)
-        }.addListener(polling).start()
+        }
+            .addListener(polling)
+            .start()
     }
 
     private fun update(rateList: FXRateList) {

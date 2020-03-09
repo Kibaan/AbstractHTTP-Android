@@ -10,10 +10,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kibaan.android.abstracthttp.entity.User
 import kibaan.android.abstracthttp.examples.R
+import kibaan.android.abstracthttp.utils.AlertUtils
 
 class GetJSONFragment : Fragment() {
 
@@ -40,7 +42,10 @@ class GetJSONFragment : Fragment() {
         }
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = RecyclerAdapter(activity!!, response)
+        recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, LinearLayoutManager(activity).orientation))
+        recyclerView.adapter = RecyclerAdapter(activity!!, response) {
+            AlertUtils.show(context!!, title = it.name ?: "", message = it.stringValue)
+        }
     }
 
     private fun buttonAction() {
@@ -49,12 +54,16 @@ class GetJSONFragment : Fragment() {
         }.start()
     }
 
-    inner class RecyclerAdapter(context: Context, var data: List<User>) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+    inner class RecyclerAdapter(context: Context, var data: List<User>, val onItemClick: ((User) -> Unit)) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
 
         private val inflater: LayoutInflater = LayoutInflater.from(context)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return ViewHolder(inflater.inflate(R.layout.list_cell_getjson, parent, false))
+            val viewHolder = ViewHolder(inflater.inflate(R.layout.list_cell_getjson, parent, false))
+            viewHolder.itemView.setOnClickListener {
+                onItemClick(data[viewHolder.adapterPosition])
+            }
+            return viewHolder
         }
 
         override fun getItemCount(): Int {

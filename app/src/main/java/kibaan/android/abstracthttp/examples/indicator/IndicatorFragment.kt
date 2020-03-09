@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import kibaan.android.abstracthttp.commonspec.WaitableAPISpec
@@ -17,7 +16,7 @@ import kibaan.android.abstracthttp.examples.R
 
 class IndicatorFragment : Fragment() {
 
-    private lateinit var indicatorView: ProgressBar
+    private lateinit var indicatorView: View
     private lateinit var textView: TextView
 
     private lateinit var indicator: ConnectionIndicator
