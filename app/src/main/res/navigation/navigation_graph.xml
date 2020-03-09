@@ -14,67 +14,89 @@
             android:id="@+id/action_to_simplest"
             app:destination="@id/simplestFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_get_json"
             app:destination="@id/getJsonFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_common_request_spec"
             app:destination="@id/commonRequestSpecFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_indicator"
             app:destination="@id/indicatorFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_listener"
             app:destination="@id/listenerFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_retry"
             app:destination="@+id/retryFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_mock"
             app:destination="@id/mockFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_polling"
             app:destination="@id/pollingFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_cancel"
             app:destination="@id/cancelFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_token_refresh"
             app:destination="@id/tokenRefreshFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
         <action
             android:id="@+id/action_to_convenient"
             app:destination="@id/convenientFragment"
             app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left" />
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right" />
 
     </fragment>
 
