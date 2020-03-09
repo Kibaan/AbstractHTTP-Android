@@ -8,14 +8,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.commonspec.SimpleGetSpec
 import kibaan.android.abstracthttp.examples.R
 
-class MockFragment : Fragment(), ExampleItem {
-
-    override val displayTitle: String
-        get() = "通信処理のカスタマイズ・モック化"
+class MockFragment : Fragment() {
 
     lateinit var textView: TextView
 

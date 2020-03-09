@@ -11,10 +11,7 @@ import androidx.fragment.app.Fragment
 import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.examples.R
 
-class CommonRequestSpecFragment : Fragment(), ExampleItem {
-
-    override val displayTitle: String
-        get() = "リクエスト仕様の共通化"
+class CommonRequestSpecFragment : Fragment() {
 
     lateinit var textView: TextView
 

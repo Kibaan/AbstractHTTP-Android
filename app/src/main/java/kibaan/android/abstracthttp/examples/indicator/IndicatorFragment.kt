@@ -12,14 +12,10 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.commonspec.WaitableAPISpec
 import kibaan.android.abstracthttp.examples.R
 
-class IndicatorFragment : Fragment(), ExampleItem {
-
-    override val displayTitle: String
-        get() = "通信インジケーターの表示"
+class IndicatorFragment : Fragment() {
 
     private lateinit var indicatorView: ProgressBar
     private lateinit var textView: TextView
@@ -53,7 +49,7 @@ class IndicatorFragment : Fragment(), ExampleItem {
         clear()
         pushLine("[START] ${spec.url}")
 
-        Connection(spec).addOnEnd { response, model, error ->
+        Connection(spec).addOnEnd { _, _, _ ->
             this.pushLine("[END  ] ${spec.url}")
         }.addListener(indicator).start()
     }
@@ -66,7 +62,7 @@ class IndicatorFragment : Fragment(), ExampleItem {
 
         val connection = Connection(spec)
         (connection.httpConnector as? DefaultHTTPConnector)?.timeoutInterval = 1.0
-        connection.addOnEnd { response, model, error ->
+        connection.addOnEnd { _, _, _ ->
             this.pushLine("[END  ] ${spec.url}")
         }.addListener(indicator).start()
     }
@@ -78,9 +74,9 @@ class IndicatorFragment : Fragment(), ExampleItem {
     }
 
     private fun sequencialRequest(max: Int, count: Int = 1) {
-        pushLine("[START] Request ${count}")
-        Connection(WaitableAPISpec(waitSeconds = 1)).addOnEnd { response, model, error ->
-            this.pushLine("[END  ] Request ${count}")
+        pushLine("[START] Request $count")
+        Connection(WaitableAPISpec(waitSeconds = 1)).addOnEnd { _, _, _ ->
+            this.pushLine("[END  ] Request $count")
             if (count < max) {
                 this.sequencialRequest(max = max, count = count + 1)
             }
@@ -92,17 +88,17 @@ class IndicatorFragment : Fragment(), ExampleItem {
         clear()
 
         pushLine("[START] Request 1")
-        Connection(WaitableAPISpec(waitSeconds = 1)).addOnEnd { response, model, error ->
+        Connection(WaitableAPISpec(waitSeconds = 1)).addOnEnd { _, _, _ ->
             this.pushLine("[END  ] Request 1")
         }.addListener(indicator).start()
 
         pushLine("[START] Request 2")
-        Connection(WaitableAPISpec(waitSeconds = 2)).addOnEnd { response, model, error ->
+        Connection(WaitableAPISpec(waitSeconds = 2)).addOnEnd { _, _, _ ->
             this.pushLine("[END  ] Request 2")
         }.addListener(indicator).start()
 
         pushLine("[START] Request 3")
-        Connection(WaitableAPISpec(waitSeconds = 3)).addOnEnd { response, model, error ->
+        Connection(WaitableAPISpec(waitSeconds = 3)).addOnEnd { _, _, _ ->
             this.pushLine("[END  ] Request 3")
         }.addListener(indicator).start()
     }

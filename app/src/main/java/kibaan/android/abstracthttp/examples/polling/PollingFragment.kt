@@ -12,17 +12,13 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.commonspec.FXRateList
 import kibaan.android.abstracthttp.commonspec.FXRateListAPI
 import kibaan.android.abstracthttp.examples.R
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PollingFragment : Fragment(), ExampleItem {
-
-    override val displayTitle: String
-        get() = "ポーリング（自動更新）"
+class PollingFragment : Fragment() {
 
     lateinit var timeLabel: TextView
     lateinit var recyclerView: RecyclerView

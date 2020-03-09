@@ -8,13 +8,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import kibaan.android.abstracthttp.ExampleItem
+import kibaan.android.abstracthttp.ExampleType
 import kibaan.android.abstracthttp.examples.R
 
-class SimplestViewController : Fragment(), ExampleItem {
+class SimplestFragment : Fragment() {
 
-    override val displayTitle: String
-        get() = "最小構成"
+    val exampleType: ExampleType = ExampleType.SIMPLEST
 
     lateinit var textView: TextView
 

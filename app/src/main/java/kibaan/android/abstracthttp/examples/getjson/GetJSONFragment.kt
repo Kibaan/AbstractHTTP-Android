@@ -12,13 +12,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.entity.User
 import kibaan.android.abstracthttp.examples.R
 
-class GetJSONFragment : Fragment(), ExampleItem {
-    override val displayTitle: String
-        get() = "JSON取得"
+class GetJSONFragment : Fragment() {
 
     lateinit var recyclerView: RecyclerView
 

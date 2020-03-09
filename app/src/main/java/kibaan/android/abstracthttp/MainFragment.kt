@@ -1,15 +1,36 @@
 package kibaan.android.abstracthttp
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kibaan.android.abstracthttp.examples.R
 
 class MainFragment : Fragment() {
+
+    lateinit var recyclerView: RecyclerView
+
+    private val exampleList: List<ExampleType> = listOf(
+        ExampleType.SIMPLEST,
+        ExampleType.GET_JSON,
+        ExampleType.COMMON_REQUEST_SPEC,
+        ExampleType.INDICATOR,
+        ExampleType.LISTENER,
+        ExampleType.RETRY,
+        ExampleType.MOCK,
+        ExampleType.POLLING,
+        ExampleType.CANCEL,
+        ExampleType.TOKEN_REFRESH
+    )
+//    ConvenientViewController()
+//    ]
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -18,13 +39,39 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.button1).setOnClickListener { findNavController().navigate(R.id.action_to_simplest) }
-        view.findViewById<Button>(R.id.button2).setOnClickListener { findNavController().navigate(R.id.action_to_get_json) }
-        view.findViewById<Button>(R.id.button3).setOnClickListener { findNavController().navigate(R.id.action_to_common_request_spec) }
-        view.findViewById<Button>(R.id.button4).setOnClickListener { findNavController().navigate(R.id.action_to_indicator) }
-        view.findViewById<Button>(R.id.button5).setOnClickListener { findNavController().navigate(R.id.action_to_listener) }
-//        view.findViewById<Button>(R.id.button6).setOnClickListener { findNavController().navigate(R.id.action_to_listener) }
-        view.findViewById<Button>(R.id.button7).setOnClickListener { findNavController().navigate(R.id.action_to_mock) }
-        view.findViewById<Button>(R.id.button8).setOnClickListener { findNavController().navigate(R.id.action_to_polling) }
+        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = RecyclerAdapter(activity!!, exampleList) {
+            findNavController().navigate(it.actionId)
+        }
+    }
+
+    inner class RecyclerAdapter(context: Context, var data: List<ExampleType>, val onItemClick: ((ExampleType) -> Unit)) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val viewHolder = ViewHolder(inflater.inflate(R.layout.list_cell_main, parent, false))
+            viewHolder.itemView.setOnClickListener {
+                val position = viewHolder.adapterPosition
+                val example = data[position]
+                onItemClick(example)
+            }
+            return viewHolder
+        }
+
+        override fun getItemCount(): Int {
+            return data.size
+        }
+
+        @SuppressLint("SetTextI18n")
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val exampleItem = data[position]
+            holder.textView.text = exampleItem.displayTitle
+        }
+
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            var textView: TextView = itemView.findViewById(R.id.textView)
+        }
     }
 }

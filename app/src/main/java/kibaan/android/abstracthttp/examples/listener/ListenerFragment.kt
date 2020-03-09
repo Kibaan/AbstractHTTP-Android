@@ -13,14 +13,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.commonspec.WaitableAPISpec
 import kibaan.android.abstracthttp.examples.R
 
-class ListenerFragment : Fragment(), ExampleItem {
-
-    override val displayTitle: String
-        get() = "各種リスナーのサンプル"
+class ListenerFragment : Fragment() {
 
     lateinit var textView: TextView
 

@@ -9,6 +9,7 @@
         android:id="@+id/mainFragment"
         android:name="kibaan.android.abstracthttp.MainFragment"
         tools:layout="@layout/fragment_main">
+
         <action
             android:id="@+id/action_to_simplest"
             app:destination="@id/simplestFragment"
@@ -40,6 +41,12 @@
             app:exitAnim="@anim/slide_to_left" />
 
         <action
+            android:id="@+id/action_to_retry"
+            app:destination="@+id/retryFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+
+        <action
             android:id="@+id/action_to_mock"
             app:destination="@id/mockFragment"
             app:enterAnim="@anim/slide_from_right"
@@ -50,11 +57,23 @@
             app:destination="@id/pollingFragment"
             app:enterAnim="@anim/slide_from_right"
             app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_cancel"
+            app:destination="@id/cancelFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
+
+        <action
+            android:id="@+id/action_to_token_refresh"
+            app:destination="@id/tokenRefreshFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left" />
     </fragment>
 
     <fragment
         android:id="@+id/simplestFragment"
-        android:name="kibaan.android.abstracthttp.examples.simplest.SimplestViewController"
+        android:name="kibaan.android.abstracthttp.examples.simplest.SimplestFragment"
         tools:layout="@layout/fragment_simplest" />
 
     <fragment
@@ -78,6 +97,11 @@
         tools:layout="@layout/fragment_listener" />
 
     <fragment
+        android:id="@+id/retryFragment"
+        android:name="kibaan.android.abstracthttp.examples.retry.RetryFragment"
+        tools:layout="@layout/fragment_retry" />
+
+    <fragment
         android:id="@+id/mockFragment"
         android:name="kibaan.android.abstracthttp.examples.mock.MockFragment"
         tools:layout="@layout/fragment_mock" />
@@ -86,5 +110,15 @@
         android:id="@+id/pollingFragment"
         android:name="kibaan.android.abstracthttp.examples.polling.PollingFragment"
         tools:layout="@layout/fragment_polling" />
+
+    <fragment
+        android:id="@+id/cancelFragment"
+        android:name="kibaan.android.abstracthttp.examples.cancel.CancelFragment"
+        tools:layout="@layout/fragment_cancel" />
+
+    <fragment
+        android:id="@+id/tokenRefreshFragment"
+        android:name="kibaan.android.abstracthttp.examples.tokenrefresh.TokenRefreshFragment"
+        tools:layout="@layout/fragment_token_refresh" />
 
 </navigation>
