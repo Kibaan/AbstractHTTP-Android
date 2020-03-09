@@ -4,8 +4,14 @@ import abstracthttp.convenient.HTTP
 import abstracthttp.entity.URLQuery
 import abstracthttp.enumtype.HTTPMethod
 import android.annotation.SuppressLint
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import kibaan.android.abstracthttp.examples.R
 import kibaan.android.abstracthttp.examples.listener.ConnectionLogger
 
 class ConvenientFragment : Fragment() {
@@ -16,19 +22,34 @@ class ConvenientFragment : Fragment() {
         ConnectionLogger(print = ::pushLine)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_convenient, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        responseTextView = view.findViewById(R.id.responseTextView)
+        logTextView = view.findViewById(R.id.logTextView)
+        view.findViewById<Button>(R.id.minimumGetActionButton).setOnClickListener { minimumGetAction(it) }
+        view.findViewById<Button>(R.id.listenerActionButton).setOnClickListener { listenerAction(it) }
+        view.findViewById<Button>(R.id.jsonActionButton).setOnClickListener { jsonAction(it) }
+        view.findViewById<Button>(R.id.postActionButton).setOnClickListener { postAction(it) }
+        view.findViewById<Button>(R.id.timeoutActionButton).setOnClickListener { timeoutAction(it) }
+    }
+
     override fun onResume() {
         super.onResume()
         clear()
     }
 
-    fun minimumGetAction(sender: Any) {
+    private fun minimumGetAction(@Suppress("UNUSED_PARAMETER") sender: Any) {
         clear()
         HTTP("https://reqres.in/api/users/2").asString {
             this.printResponse(it)
         }
     }
 
-    fun listenerAction(sender: Any) {
+    private fun listenerAction(@Suppress("UNUSED_PARAMETER") sender: Any) {
         clear()
         HTTP("https://reqres.in/api/users/2")
             .addListener(logger)
@@ -40,7 +61,7 @@ class ConvenientFragment : Fragment() {
             }
     }
 
-    fun jsonAction(sender: Any) {
+    private fun jsonAction(@Suppress("UNUSED_PARAMETER") sender: Any) {
         clear()
         // TODO JSONのパースをどうする？
 //        HTTP("https://jsonplaceholder.typicode.com/users/1")
@@ -49,7 +70,7 @@ class ConvenientFragment : Fragment() {
 //            }
     }
 
-    fun postAction(sender: Any) {
+    private fun postAction(@Suppress("UNUSED_PARAMETER") sender: Any) {
         clear()
         val body = """
             {
@@ -66,7 +87,7 @@ class ConvenientFragment : Fragment() {
             }
     }
 
-    fun timeoutAction(sender: Any) {
+    private fun timeoutAction(@Suppress("UNUSED_PARAMETER") sender: Any) {
         clear()
         HTTP("https://apidemo.altonotes.co.jp/timeout-test")
             .urlQuery(URLQuery("waitSeconds" to "2"))
@@ -101,5 +122,4 @@ class ConvenientFragment : Fragment() {
     private fun pushLine(text: String) {
         this.logTextView.text = this.logTextView.text.toString() + text + "\n"
     }
-
 }

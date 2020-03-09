@@ -12,7 +12,8 @@ enum class ExampleType : ExampleItem {
     MOCK,
     POLLING,
     CANCEL,
-    TOKEN_REFRESH;
+    TOKEN_REFRESH,
+    CONVENIENT;
 
     override val displayTitle: String
         get() = when (this) {
@@ -26,6 +27,7 @@ enum class ExampleType : ExampleItem {
             POLLING -> "ポーリング（自動更新）"
             CANCEL -> "通信キャンセル"
             TOKEN_REFRESH -> "トークンリフレッシュ"
+            CONVENIENT -> "簡易インターフェース"
         }
 
     override val actionId: Int
@@ -40,5 +42,6 @@ enum class ExampleType : ExampleItem {
             POLLING -> R.id.action_to_polling
             CANCEL -> R.id.action_to_cancel
             TOKEN_REFRESH -> R.id.action_to_token_refresh
+            CONVENIENT -> R.id.action_to_convenient
         }
 }

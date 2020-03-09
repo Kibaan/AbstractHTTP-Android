@@ -9,13 +9,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kibaan.android.abstracthttp.examples.R
 
 class MainFragment : Fragment() {
 
-    lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerView: RecyclerView
 
     private val exampleList: List<ExampleType> = listOf(
         ExampleType.SIMPLEST,
@@ -27,10 +28,9 @@ class MainFragment : Fragment() {
         ExampleType.MOCK,
         ExampleType.POLLING,
         ExampleType.CANCEL,
-        ExampleType.TOKEN_REFRESH
+        ExampleType.TOKEN_REFRESH,
+        ExampleType.CONVENIENT
     )
-//    ConvenientViewController()
-//    ]
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -41,6 +41,7 @@ class MainFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, LinearLayoutManager(activity).orientation))
         recyclerView.adapter = RecyclerAdapter(activity!!, exampleList) {
             findNavController().navigate(it.actionId)
         }
