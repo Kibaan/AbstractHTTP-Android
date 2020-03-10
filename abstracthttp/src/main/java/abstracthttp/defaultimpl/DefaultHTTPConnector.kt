@@ -109,8 +109,8 @@ class DefaultHTTPConnector : HTTPConnector {
             // 自動的でリダイレクトはしないように設定する（独自実装で制御）
             connection.instanceFollowRedirects = false
             // 接続タイムアウト指定
-            connection.connectTimeout = timeoutInterval.toInt() * 1000
-            connection.readTimeout = timeoutInterval.toInt() * 1000
+            connection.connectTimeout = (timeoutInterval * 1000).toInt()
+            connection.readTimeout = (timeoutInterval * 1000).toInt()
             // ヘッダー付与
             request.headers.forEach {
                 connection.setRequestProperty(it.key, it.value)

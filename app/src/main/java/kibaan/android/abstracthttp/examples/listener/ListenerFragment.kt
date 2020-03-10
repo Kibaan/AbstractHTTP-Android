@@ -44,7 +44,7 @@ class ListenerFragment : Fragment() {
         val listener = ConnectionLogger(print = ::pushLine)
 
         clear()
-        Connection(WaitableAPISpec()) { response ->
+        Connection(WaitableAPISpec()) {
             this.pushLine("(SUCCESS callback)")
         }
             .addListener(listener)
@@ -57,7 +57,7 @@ class ListenerFragment : Fragment() {
     private fun timeoutAction() {
 
         clear()
-        val connection = Connection(WaitableAPISpec(waitSeconds = 3)) { response ->
+        val connection = Connection(WaitableAPISpec(waitSeconds = 3)) {
             this.pushLine("(SUCCESS callback)")
         }
 
@@ -81,7 +81,7 @@ class ListenerFragment : Fragment() {
     private fun cancelAction() {
 
         clear()
-        val connection = Connection(WaitableAPISpec(waitSeconds = 3)) { response ->
+        val connection = Connection(WaitableAPISpec(waitSeconds = 3)) {
             this.pushLine("(SUCCESS callback)")
         }
 
@@ -98,7 +98,7 @@ class ListenerFragment : Fragment() {
     private fun interruptAction() {
         clear()
 
-        val connection = Connection(WaitableAPISpec(waitSeconds = 1)) { response ->
+        val connection = Connection(WaitableAPISpec(waitSeconds = 1)) {
             this.pushLine("(SUCCESS callback)")
         }
 

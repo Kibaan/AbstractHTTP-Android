@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kibaan.android.abstracthttp.commonspec.FXRateList
@@ -17,7 +18,6 @@ import kibaan.android.abstracthttp.commonspec.FXRateListAPI
 import kibaan.android.abstracthttp.examples.R
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.concurrent.schedule
 
 class PollingFragment : Fragment() {
 
@@ -40,6 +40,7 @@ class PollingFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, LinearLayoutManager(activity).orientation))
         recyclerView.adapter = RecyclerAdapter(activity!!, rateList = null)
     }
 

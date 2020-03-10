@@ -6,35 +6,33 @@ import abstracthttp.entity.ConnectionError
 import abstracthttp.entity.Request
 import abstracthttp.entity.Response
 import abstracthttp.enumtype.ConnectionErrorType
+import android.os.Handler
 import java.util.*
 import kotlin.concurrent.schedule
 
 class Polling(val delaySeconds: Long, val callback: () -> Unit) : ConnectionListener {
-    var timer: TimerTask? = null
+
+    var handler = Handler()
+    var runnable = Runnable { callback() }
 
     var connection: Connection<*>? = null
 
     override fun onStart(connection: Connection<*>, request: Request) {
-        this.connection?.cancel()
+        stop()
         this.connection = connection
     }
 
     override fun onEnd(connection: Connection<*>, response: Response?, responseModel: Any?, error: ConnectionError?) {
         if (error == null || error.type == ConnectionErrorType.network) {
-            timer = Timer().schedule(0, delaySeconds * 1000) {
-                timer = null
-                callback()
-            }
+            handler.postDelayed(runnable, delaySeconds * 1000)
         } else if (error.type == ConnectionErrorType.canceled) {
-            timer?.cancel()
-            timer = null
+            handler.removeCallbacks(runnable)
         }
         this.connection = null
     }
 
     fun stop() {
-        timer?.cancel()
-        timer = null
+        handler.removeCallbacks(runnable)
         connection?.cancel()
         connection = null
     }
