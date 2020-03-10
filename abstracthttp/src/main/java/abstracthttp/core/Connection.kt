@@ -176,7 +176,6 @@ open class Connection<ResponseModel: Any> {
         holder.add(connection = this)
 
         if (isLogEnabled) {
-            // TODO ログ出力する
             print("[${requestSpec.httpMethod.stringValue}] $url")
         }
 
@@ -291,7 +290,6 @@ open class Connection<ResponseModel: Any> {
         // エラーログ出力
         if (isLogEnabled) {
             val message = error?.toString() ?: ""
-            // TODO Log.dにしなくてよいのか？
             print("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
         }
 
