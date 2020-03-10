@@ -39,6 +39,7 @@
             android:layout_weight="1"
             android:padding="0dp"
             android:text="JSON"
+            android:visibility="invisible"
             tools:ignore="HardcodedText" />
 
         <Button

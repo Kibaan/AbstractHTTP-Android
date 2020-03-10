@@ -94,13 +94,6 @@ class HTTP {
         return start(parse = { it.data }, callback = callback)
     }
 
-    // TODO JSONのパースをどうする？
-//    fun <T: Any> asDecodable(type: KClass<T>, callback: (T) -> Unit) : Connection<T> {
-//        return start(parse = { response  ->
-//            JSONDecoder().decode(type, from = response.data)
-//        }, callback = callback)
-//    }
-
     fun <T: Any> asModel(parse: (Response) -> T, callback: (T) -> Unit) : Connection<T> {
         return start(parse = parse, callback = callback)
     }

@@ -32,7 +32,6 @@ class ConvenientFragment : Fragment() {
         logTextView = view.findViewById(R.id.logTextView)
         view.findViewById<Button>(R.id.minimumGetActionButton).setOnClickListener { minimumGetAction(it) }
         view.findViewById<Button>(R.id.listenerActionButton).setOnClickListener { listenerAction(it) }
-        view.findViewById<Button>(R.id.jsonActionButton).setOnClickListener { jsonAction(it) }
         view.findViewById<Button>(R.id.postActionButton).setOnClickListener { postAction(it) }
         view.findViewById<Button>(R.id.timeoutActionButton).setOnClickListener { timeoutAction(it) }
     }
@@ -59,15 +58,6 @@ class ConvenientFragment : Fragment() {
                 this.pushLine("(SUCCESS callback)")
                 this.printResponse(it)
             }
-    }
-
-    private fun jsonAction(@Suppress("UNUSED_PARAMETER") sender: Any) {
-        clear()
-        // TODO JSONのパースをどうする？
-//        HTTP("https://jsonplaceholder.typicode.com/users/1")
-//            .asDecodable(type = User.self) { user ->
-//                this.printResponse(user.stringValue)
-//            }
     }
 
     private fun postAction(@Suppress("UNUSED_PARAMETER") sender: Any) {
