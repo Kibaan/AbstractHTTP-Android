@@ -14,8 +14,6 @@ import java.net.*
 
 /**
  * HTTP通信の標準実装
- * TODO まだ精査できていない
- *
  */
 class DefaultHTTPConnector : HTTPConnector {
 
@@ -73,7 +71,7 @@ class DefaultHTTPConnector : HTTPConnector {
                 connection.connect()
 
                 // キャンセル済みの場合は以降の処理は実行しない
-                if (job?.isCancelled == true) throw IOException("The connection is cancelled by program.")
+                assertNotCancelled()
 
                 // ヘッダーの取得
                 headerFields = connection.headerFields
@@ -88,17 +86,28 @@ class DefaultHTTPConnector : HTTPConnector {
                     val isSeeOther = connection.responseCode == 303
                     val body = if (isSeeOther) null else request.body
                     val method = if (isSeeOther) HTTPMethod.get else request.method
+
+                    // NOTE 再帰的に呼び出しをしている為、無限にリダイレクトする可能性がある
                     return connect(request = Request(url = location, method = method, body = body, headers = request.headers))
                 }
-                return makeResponse(connection.responseCode, headerFields, connection.inputStream)
+                val response = makeResponse(connection.responseCode, headerFields, connection.inputStream, connection)
+
+                // キャンセル済みの場合は以降の処理は実行しない
+                assertNotCancelled()
+
+                return response
             } catch (e: IOException) {
                 if (connection == null) throw e
 
                 // 404などの場合Exceptionが発生してもレスポンスがあるので読み取り
-                return makeResponse(connection.responseCode, headerFields, connection.errorStream) ?: throw e
+                return makeResponse(connection.responseCode, headerFields, connection.errorStream, connection) ?: throw e
             } finally {
                 connection?.disconnect()
             }
+        }
+
+        private fun assertNotCancelled() {
+            if (job?.isCancelled == true) throw IOException("The connection is cancelled by program.")
         }
 
         private fun makeURLConnection(request: Request): HttpURLConnection {
@@ -116,8 +125,10 @@ class DefaultHTTPConnector : HTTPConnector {
                 connection.setRequestProperty(it.key, it.value)
             }
             // クッキー付与
-            cookieManager.cookieStore.get(request.url.toURI()).forEach {
-                connection.setRequestProperty("Cookie", it.toString())
+            if (isCookieEnabled) {
+                cookieManager.cookieStore.get(request.url.toURI()).forEach {
+                    connection.setRequestProperty("Cookie", it.toString())
+                }
             }
             // リクエストボディの設定
             if (request.body != null) {
@@ -141,7 +152,7 @@ class DefaultHTTPConnector : HTTPConnector {
             return null
         }
 
-        private fun makeResponse(statusCode: Int, headerFields: Map<String?, List<String>>?, inputStream: InputStream?): Response? {
+        private fun makeResponse(statusCode: Int, headerFields: Map<String?, List<String>>?, inputStream: InputStream?, connection: HttpURLConnection): Response? {
             val headerFields = headerFields ?: return null
             val responseData = inputStream?.readBytes() ?: return null
             val headers = mutableMapOf<String, String>()
@@ -149,7 +160,7 @@ class DefaultHTTPConnector : HTTPConnector {
                 val key = it.key ?: return@forEach
                 headers[key] = it.value.joinToString(", ")
             }
-            return Response(data = responseData, statusCode = statusCode, headers = headers, nativeResponse = null)
+            return Response(data = responseData, statusCode = statusCode, headers = headers, nativeResponse = connection)
         }
     }
 }
