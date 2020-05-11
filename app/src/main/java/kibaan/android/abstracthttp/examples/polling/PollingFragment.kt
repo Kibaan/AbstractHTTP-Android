@@ -1,7 +1,7 @@
 package kibaan.android.abstracthttp.examples.polling
 
-import abstracthttp.core.Connection
-import abstracthttp.defaultimpl.Polling
+import abstracthttp.android.core.Connection
+import abstracthttp.android.defaultimpl.Polling
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle

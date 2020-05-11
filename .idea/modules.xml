@@ -3,10 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AbstractHTTP-Android.iml" filepath="$PROJECT_DIR$/AbstractHTTP-Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/abstracthttp/AbstractHTTP-Android-abstracthttp.iml" filepath="$PROJECT_DIR$/abstracthttp/AbstractHTTP-Android-abstracthttp.iml" group="AbstractHTTP-Android/abstracthttp" />
+      <module fileurl="file://$PROJECT_DIR$/app/AbstractHTTP-Android-app.iml" filepath="$PROJECT_DIR$/app/AbstractHTTP-Android-app.iml" group="AbstractHTTP-Android/app" />
       <module fileurl="file://$PROJECT_DIR$/AbstractHTTP-android-AbstractHTTP-Android.iml" filepath="$PROJECT_DIR$/AbstractHTTP-android-AbstractHTTP-Android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/abstracthttp/AbstractHTTP-android-abstracthttp.iml" filepath="$PROJECT_DIR$/abstracthttp/AbstractHTTP-android-abstracthttp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/AbstractHTTP-android-app.iml" filepath="$PROJECT_DIR$/app/AbstractHTTP-android-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/AndroidDev-AbstractHTTP-Android.iml" filepath="$PROJECT_DIR$/AndroidDev-AbstractHTTP-Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StudioProjects-AbstractHTTP-Android.iml" filepath="$PROJECT_DIR$/StudioProjects-AbstractHTTP-Android.iml" group="AbstractHTTP-Android" />
       <module fileurl="file://$PROJECT_DIR$/abstracthttp/abstracthttp.iml" filepath="$PROJECT_DIR$/abstracthttp/abstracthttp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

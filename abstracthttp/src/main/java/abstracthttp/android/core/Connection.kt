@@ -1,10 +1,10 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
-import abstracthttp.entity.ConnectionError
-import abstracthttp.entity.Request
-import abstracthttp.entity.Response
-import abstracthttp.entity.URLQuery
-import abstracthttp.enumtype.ConnectionErrorType
+import abstracthttp.android.entity.ConnectionError
+import abstracthttp.android.entity.Request
+import abstracthttp.android.entity.Response
+import abstracthttp.android.entity.URLQuery
+import abstracthttp.android.enumtype.ConnectionErrorType
 import java.net.URL
 
 /**

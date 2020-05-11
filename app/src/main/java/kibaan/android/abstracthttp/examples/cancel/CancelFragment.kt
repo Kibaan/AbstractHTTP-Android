@@ -1,7 +1,7 @@
 package kibaan.android.abstracthttp.examples.cancel
 
-import abstracthttp.core.Connection
-import abstracthttp.core.ConnectionHolder
+import abstracthttp.android.core.Connection
+import abstracthttp.android.core.ConnectionHolder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

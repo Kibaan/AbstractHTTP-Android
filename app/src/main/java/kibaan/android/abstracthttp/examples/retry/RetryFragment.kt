@@ -1,7 +1,7 @@
 package kibaan.android.abstracthttp.examples.retry
 
-import abstracthttp.core.Connection
-import abstracthttp.defaultimpl.DefaultHTTPConnector
+import abstracthttp.android.core.Connection
+import abstracthttp.android.defaultimpl.DefaultHTTPConnector
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater

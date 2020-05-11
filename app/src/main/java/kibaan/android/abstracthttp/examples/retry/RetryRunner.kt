@@ -1,9 +1,9 @@
 package kibaan.android.abstracthttp.examples.retry
 
-import abstracthttp.core.Connection
-import abstracthttp.core.ConnectionErrorListener
-import abstracthttp.entity.ConnectionError
-import abstracthttp.entity.Response
+import abstracthttp.android.core.Connection
+import abstracthttp.android.core.ConnectionErrorListener
+import abstracthttp.android.entity.ConnectionError
+import abstracthttp.android.entity.Response
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 

@@ -1,6 +1,6 @@
 package kibaan.android.abstracthttp.examples.commonrequestspec
 
-import abstracthttp.enumtype.HTTPMethod
+import abstracthttp.android.enumtype.HTTPMethod
 import com.google.gson.reflect.TypeToken
 import kibaan.android.abstracthttp.entity.User
 import java.lang.reflect.Type

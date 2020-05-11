@@ -1,9 +1,9 @@
 package kibaan.android.abstracthttp.examples.listener
 
-import abstracthttp.core.Connection
-import abstracthttp.core.ConnectionResponseListener
-import abstracthttp.defaultimpl.DefaultHTTPConnector
-import abstracthttp.entity.Response
+import abstracthttp.android.core.Connection
+import abstracthttp.android.core.ConnectionResponseListener
+import abstracthttp.android.defaultimpl.DefaultHTTPConnector
+import abstracthttp.android.entity.Response
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler

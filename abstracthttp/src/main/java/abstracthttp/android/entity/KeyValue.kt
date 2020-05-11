@@ -1,6 +1,6 @@
-package abstracthttp.entity
+package abstracthttp.android.entity
 
-import abstracthttp.core.URLEncoder
+import abstracthttp.android.core.URLEncoder
 
 /**
  * キーと値のペア

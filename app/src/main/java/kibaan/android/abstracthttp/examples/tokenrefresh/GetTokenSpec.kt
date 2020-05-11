@@ -1,9 +1,9 @@
 package kibaan.android.abstracthttp.examples.tokenrefresh
 
-import abstracthttp.core.ConnectionSpec
-import abstracthttp.entity.Response
-import abstracthttp.entity.URLQuery
-import abstracthttp.enumtype.HTTPMethod
+import abstracthttp.android.core.ConnectionSpec
+import abstracthttp.android.entity.Response
+import abstracthttp.android.entity.URLQuery
+import abstracthttp.android.enumtype.HTTPMethod
 
 /**
  * このAPIで取得したトークンは有効期限が15秒で、期限が切れると401エラーが発生する

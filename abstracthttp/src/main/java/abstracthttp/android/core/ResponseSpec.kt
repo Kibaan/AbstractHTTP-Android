@@ -1,6 +1,6 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
-import abstracthttp.entity.Response
+import abstracthttp.android.entity.Response
 
 /**
  * HTTPレスポンスの仕様

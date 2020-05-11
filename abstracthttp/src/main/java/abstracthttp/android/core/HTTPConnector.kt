@@ -1,7 +1,7 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
-import abstracthttp.entity.Request
-import abstracthttp.entity.Response
+import abstracthttp.android.entity.Request
+import abstracthttp.android.entity.Response
 
 
 /**

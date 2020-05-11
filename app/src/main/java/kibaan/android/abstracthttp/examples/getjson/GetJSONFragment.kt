@@ -1,6 +1,6 @@
 package kibaan.android.abstracthttp.examples.getjson
 
-import abstracthttp.core.Connection
+import abstracthttp.android.core.Connection
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle

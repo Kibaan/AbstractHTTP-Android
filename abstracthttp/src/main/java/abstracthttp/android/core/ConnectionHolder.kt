@@ -1,4 +1,4 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
 /**
  * 実行中の通信オブジェクトを保持するためのコンテナ

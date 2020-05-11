@@ -1,11 +1,11 @@
-package abstracthttp.convenient
+package abstracthttp.android.convenient
 
-import abstracthttp.core.*
-import abstracthttp.defaultimpl.DefaultHTTPConnector
-import abstracthttp.entity.ConnectionError
-import abstracthttp.entity.Response
-import abstracthttp.entity.URLQuery
-import abstracthttp.enumtype.HTTPMethod
+import abstracthttp.android.core.*
+import abstracthttp.android.defaultimpl.DefaultHTTPConnector
+import abstracthttp.android.entity.ConnectionError
+import abstracthttp.android.entity.Response
+import abstracthttp.android.entity.URLQuery
+import abstracthttp.android.enumtype.HTTPMethod
 import java.nio.charset.Charset
 
 

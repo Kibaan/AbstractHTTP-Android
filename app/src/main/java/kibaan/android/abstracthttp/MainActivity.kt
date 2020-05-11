@@ -1,8 +1,8 @@
 package kibaan.android.abstracthttp
 
-import abstracthttp.core.Connection
-import abstracthttp.core.ConnectionHolder
-import abstracthttp.core.ConnectionHolderListener
+import abstracthttp.android.core.Connection
+import abstracthttp.android.core.ConnectionHolder
+import abstracthttp.android.core.ConnectionHolderListener
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity

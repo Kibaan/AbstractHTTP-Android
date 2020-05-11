@@ -1,6 +1,6 @@
 package kibaan.android.abstracthttp.examples.commonrequestspec
 
-import abstracthttp.core.Connection
+import abstracthttp.android.core.Connection
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import kibaan.android.abstracthttp.ExampleItem
 import kibaan.android.abstracthttp.examples.R
 
 class CommonRequestSpecFragment : Fragment() {

@@ -1,6 +1,6 @@
-package abstracthttp.entity
+package abstracthttp.android.entity
 
-import abstracthttp.enumtype.HTTPMethod
+import abstracthttp.android.enumtype.HTTPMethod
 import java.net.URL
 
 /**

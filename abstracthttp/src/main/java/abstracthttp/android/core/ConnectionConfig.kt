@@ -1,9 +1,9 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
 import android.os.Handler
 import android.os.Looper
-import abstracthttp.defaultimpl.DefaultHTTPConnector
-import abstracthttp.defaultimpl.DefaultURLEncoder
+import abstracthttp.android.defaultimpl.DefaultHTTPConnector
+import abstracthttp.android.defaultimpl.DefaultURLEncoder
 
 /// 通信のコンフィグ
 /// `Connection` オブジェクトの各種初期値を決める

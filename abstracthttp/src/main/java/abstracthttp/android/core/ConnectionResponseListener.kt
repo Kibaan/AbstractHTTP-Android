@@ -1,6 +1,6 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
-import abstracthttp.entity.Response
+import abstracthttp.android.entity.Response
 
 /**
  * 通信のレスポンスを受け取るリスナー。主に複数の通信で共通の後処理を行うために使う。

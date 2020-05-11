@@ -1,11 +1,11 @@
-package abstracthttp.defaultimpl
+package abstracthttp.android.defaultimpl
 
 import android.view.View
-import abstracthttp.core.Connection
-import abstracthttp.core.ConnectionListener
-import abstracthttp.entity.ConnectionError
-import abstracthttp.entity.Request
-import abstracthttp.entity.Response
+import abstracthttp.android.core.Connection
+import abstracthttp.android.core.ConnectionListener
+import abstracthttp.android.entity.ConnectionError
+import abstracthttp.android.entity.Request
+import abstracthttp.android.entity.Response
 
 /**
  * 通信インジケーター。

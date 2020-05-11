@@ -1,9 +1,9 @@
-package abstracthttp.defaultimpl
+package abstracthttp.android.defaultimpl
 
-import abstracthttp.core.HTTPConnector
-import abstracthttp.entity.Request
-import abstracthttp.entity.Response
-import abstracthttp.enumtype.HTTPMethod
+import abstracthttp.android.core.HTTPConnector
+import abstracthttp.android.entity.Request
+import abstracthttp.android.entity.Response
+import abstracthttp.android.enumtype.HTTPMethod
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

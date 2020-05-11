@@ -1,9 +1,9 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
-import abstracthttp.entity.ConnectionError
-import abstracthttp.entity.Response
-import abstracthttp.enumtype.ConnectionErrorType
-import abstracthttp.enumtype.ConnectionErrorType.*
+import abstracthttp.android.entity.ConnectionError
+import abstracthttp.android.entity.Response
+import abstracthttp.android.enumtype.ConnectionErrorType
+import abstracthttp.android.enumtype.ConnectionErrorType.*
 
 
 /**

@@ -1,12 +1,12 @@
 package kibaan.android.abstracthttp.examples.listener
 
-import abstracthttp.core.Connection
-import abstracthttp.core.ConnectionErrorListener
-import abstracthttp.core.ConnectionListener
-import abstracthttp.core.ConnectionResponseListener
-import abstracthttp.entity.ConnectionError
-import abstracthttp.entity.Request
-import abstracthttp.entity.Response
+import abstracthttp.android.core.Connection
+import abstracthttp.android.core.ConnectionErrorListener
+import abstracthttp.android.core.ConnectionListener
+import abstracthttp.android.core.ConnectionResponseListener
+import abstracthttp.android.entity.ConnectionError
+import abstracthttp.android.entity.Request
+import abstracthttp.android.entity.Response
 import java.lang.Exception
 
 

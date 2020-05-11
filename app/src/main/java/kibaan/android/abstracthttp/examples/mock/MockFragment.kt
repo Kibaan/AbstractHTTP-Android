@@ -1,6 +1,6 @@
 package kibaan.android.abstracthttp.examples.mock
 
-import abstracthttp.core.Connection
+import abstracthttp.android.core.Connection
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

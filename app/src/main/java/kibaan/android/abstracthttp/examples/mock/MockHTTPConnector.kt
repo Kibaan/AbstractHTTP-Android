@@ -1,8 +1,8 @@
 package kibaan.android.abstracthttp.examples.mock
 
-import abstracthttp.core.HTTPConnector
-import abstracthttp.entity.Request
-import abstracthttp.entity.Response
+import abstracthttp.android.core.HTTPConnector
+import abstracthttp.android.entity.Request
+import abstracthttp.android.entity.Response
 
 class MockHTTPConnector : HTTPConnector {
 

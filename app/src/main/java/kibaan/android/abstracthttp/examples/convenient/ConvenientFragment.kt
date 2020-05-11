@@ -1,8 +1,8 @@
 package kibaan.android.abstracthttp.examples.convenient
 
-import abstracthttp.convenient.HTTP
-import abstracthttp.entity.URLQuery
-import abstracthttp.enumtype.HTTPMethod
+import abstracthttp.android.convenient.HTTP
+import abstracthttp.android.entity.URLQuery
+import abstracthttp.android.enumtype.HTTPMethod
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater

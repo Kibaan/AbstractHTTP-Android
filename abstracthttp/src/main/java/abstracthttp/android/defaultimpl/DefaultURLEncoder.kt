@@ -1,6 +1,6 @@
-package abstracthttp.defaultimpl
+package abstracthttp.android.defaultimpl
 
-import abstracthttp.core.URLEncoder
+import abstracthttp.android.core.URLEncoder
 
 
 /**

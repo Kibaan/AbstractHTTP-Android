@@ -1,9 +1,9 @@
 package kibaan.android.abstracthttp.commonspec
 
-import abstracthttp.core.ConnectionSpec
-import abstracthttp.entity.Response
-import abstracthttp.entity.URLQuery
-import abstracthttp.enumtype.HTTPMethod
+import abstracthttp.android.core.ConnectionSpec
+import abstracthttp.android.entity.Response
+import abstracthttp.android.entity.URLQuery
+import abstracthttp.android.enumtype.HTTPMethod
 
 
 /**

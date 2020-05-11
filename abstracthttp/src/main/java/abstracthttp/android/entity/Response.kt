@@ -1,4 +1,4 @@
-package abstracthttp.entity
+package abstracthttp.android.entity
 
 /**
  * HTTPレスポンスの情報

@@ -1,6 +1,6 @@
-package abstracthttp.entity
+package abstracthttp.android.entity
 
-import abstracthttp.enumtype.ConnectionErrorType
+import abstracthttp.android.enumtype.ConnectionErrorType
 
 /**
  * 通信エラーの情報

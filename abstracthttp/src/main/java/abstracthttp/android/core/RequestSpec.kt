@@ -1,7 +1,7 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
-import abstracthttp.enumtype.HTTPMethod
-import abstracthttp.entity.URLQuery
+import abstracthttp.android.enumtype.HTTPMethod
+import abstracthttp.android.entity.URLQuery
 
 /**
  * HTTPリクエストの仕様

@@ -1,4 +1,4 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
 
 /**

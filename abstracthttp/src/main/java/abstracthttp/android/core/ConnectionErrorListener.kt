@@ -1,7 +1,7 @@
-package abstracthttp.core
+package abstracthttp.android.core
 
-import abstracthttp.entity.ConnectionError
-import abstracthttp.entity.Response
+import abstracthttp.android.entity.ConnectionError
+import abstracthttp.android.entity.Response
 
 /**
  * 通信エラーを受け取るリスナー。

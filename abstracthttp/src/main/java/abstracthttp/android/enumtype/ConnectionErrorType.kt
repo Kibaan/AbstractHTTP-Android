@@ -1,4 +1,4 @@
-package abstracthttp.enumtype
+package abstracthttp.android.enumtype
 
 /**
  * HTTP通信のエラー種別

@@ -1,8 +1,8 @@
 package kibaan.android.abstracthttp.examples.indicator
 
-import abstracthttp.core.Connection
-import abstracthttp.defaultimpl.ConnectionIndicator
-import abstracthttp.defaultimpl.DefaultHTTPConnector
+import abstracthttp.android.core.Connection
+import abstracthttp.android.defaultimpl.ConnectionIndicator
+import abstracthttp.android.defaultimpl.DefaultHTTPConnector
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
