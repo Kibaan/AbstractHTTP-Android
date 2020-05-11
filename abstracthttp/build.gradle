@@ -1,6 +1,9 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+
+def abstractHttpVersion = "0.7.00"
+
 android {
     compileSdkVersion 29
 
@@ -36,4 +39,18 @@ dependencies {
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3'
+}
+
+apply plugin: 'maven'
+
+def repo = new File(rootDir, "repository")
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository url: "file://${repo.absolutePath}"
+            pom.version = abstractHttpVersion
+            pom.groupId = 'abstracthttp.android'
+            pom.artifactId = 'abstracthttp'
+        }
+    }
 }
