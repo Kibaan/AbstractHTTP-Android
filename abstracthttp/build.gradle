@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-def abstractHttpVersion = "0.7.00"
+def abstractHttpVersion = "0.7.10"
 
 android {
     compileSdkVersion 29
