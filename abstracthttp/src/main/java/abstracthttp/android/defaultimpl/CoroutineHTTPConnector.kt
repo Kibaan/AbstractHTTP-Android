@@ -4,15 +4,18 @@ import abstracthttp.android.core.HTTPConnector
 import abstracthttp.android.entity.Request
 import abstracthttp.android.entity.Response
 import abstracthttp.android.enumtype.HTTPMethod
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
 import java.net.*
-import kotlin.concurrent.thread
 
 /**
- * スレッドを使ったHTTP通信の実装
+ * コルーチンを使ったHTTP通信の実装
  */
-class DefaultHTTPConnector : HTTPConnector {
+class CoroutineHTTPConnector : HTTPConnector {
 
     companion object {
         val cookieManager: CookieManager = CookieManager()
@@ -41,10 +44,10 @@ class DefaultHTTPConnector : HTTPConnector {
 
     private inner class HTTPTask(private val complete: (Response?, Exception?) -> Unit) {
 
-        private var thread: Thread? = null
+        private var job: Job? = null
 
         fun execute(request: Request) {
-            thread = thread {
+            job = CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val response = connect(request = request)
                     complete(response, null)
@@ -55,7 +58,7 @@ class DefaultHTTPConnector : HTTPConnector {
         }
 
         fun cancel() {
-            thread?.interrupt()
+            job?.cancel()
         }
 
         private fun connect(request: Request): Response? {
@@ -104,7 +107,7 @@ class DefaultHTTPConnector : HTTPConnector {
         }
 
         private fun assertNotCancelled() {
-            if (thread?.isInterrupted == true) throw IOException("The connection is cancelled by program.")
+            if (job?.isCancelled == true) throw IOException("The connection is cancelled by program.")
         }
 
         private fun makeURLConnection(request: Request): HttpURLConnection {
