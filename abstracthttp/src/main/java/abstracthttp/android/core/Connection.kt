@@ -87,15 +87,6 @@ open class Connection<ResponseModel: Any> {
         connect()
     }
 
-
-    /**
-     * 通信を再実行する
-     *
-     */
-    open fun restart() {
-        connect()
-    }
-
     /**
      * 直近のリクエストを再送信する。
      * `restart` に近いふるまいになるが、リクエスト内容を再構築するか直近と全く同じリクエスト内容を使うかが異なる。
@@ -148,6 +139,7 @@ open class Connection<ResponseModel: Any> {
      */
     private fun connect(request: Request? = null) {
         val callOnStart = (this.executionId == null && interruptedId == null)
+
         val executionId = ExecutionId()
         this.executionId = executionId
         this.interruptedId = null
@@ -201,8 +193,8 @@ open class Connection<ResponseModel: Any> {
 
         var listenerResult = true
         responseListeners.forEach {
-            listenerResult = listenerResult && it.onReceived(connection = this, response = response)
             if (executionId != this.executionId) { return }
+            listenerResult = listenerResult && it.onReceived(connection = this, response = response)
         }
 
         if (!listenerResult || !validate(response)) {
@@ -214,6 +206,7 @@ open class Connection<ResponseModel: Any> {
     }
 
     open fun handleResponse(response: Response, executionId: ExecutionId) {
+        if (executionId != this.executionId) { return }
 
         val responseModel: ResponseModel
 
@@ -226,14 +219,18 @@ open class Connection<ResponseModel: Any> {
 
         var listenerResult = true
         responseListeners.forEach {
+            if (executionId != this.executionId) { return }
             listenerResult = listenerResult && it.onReceivedModel(connection = this, responseModel = responseModel)
         }
+
         if (!listenerResult) {
             onValidationError(response = response, responseModel = responseModel, executionId = executionId)
             return
         }
 
-        callback {
+        callback closure@{
+            if (executionId != this.executionId) { return@closure }
+
             this.onSuccess?.invoke(responseModel)
             this.responseListeners.forEach {
                 it.afterSuccess(connection = this, responseModel = responseModel)
@@ -287,6 +284,8 @@ open class Connection<ResponseModel: Any> {
                             responseModel: ResponseModel? = null,
                             executionId: ExecutionId,
                             callListener: (ConnectionErrorListener) -> Unit) {
+        if (executionId != this.executionId) { return }
+
         // エラーログ出力
         if (isLogEnabled) {
             val message = error?.toString() ?: ""
@@ -308,9 +307,10 @@ open class Connection<ResponseModel: Any> {
                              responseModel: ResponseModel? = null,
                              executionId: ExecutionId,
                              callListener: (ConnectionErrorListener) -> Unit) {
+
         errorListeners.forEach {
-            callListener(it)
             if (executionId != this.executionId) { return }
+            callListener(it)
         }
 
         val connectionError = ConnectionError(type = type, nativeError = error)
@@ -329,6 +329,7 @@ open class Connection<ResponseModel: Any> {
     private fun end(response: Response?, responseModel: Any?, error: ConnectionError?) {
         holder.remove(connection = this)
         executionId = null
+        interruptedId = null
         listeners.forEach { it.onEnd(connection = this, response = response, responseModel = responseModel, error = error) }
     }
 

@@ -84,7 +84,7 @@ class TokenRefresher(val tokenContainer: TokenContainer, val fail: Boolean = fal
         Connection(GetTokenSpec(fail = fail)) { token ->
             this.printFunc("トークン取得完了、再通信。")
             this.tokenContainer.token = token
-            connection.restart()
+            connection.start()
         }.addOnError { _, _, _ ->
             this.printFunc("トークン取得失敗")
             connection.breakInterruption()

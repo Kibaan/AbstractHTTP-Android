@@ -25,7 +25,7 @@ class RetryRunner(val context: Context) : ConnectionErrorListener {
     }
 
     private fun retry(connection: Connection<*>) {
-        connection.restart()
+        connection.start()
     }
 
     override fun onResponseError(connection: Connection<*>, response: Response) {}
