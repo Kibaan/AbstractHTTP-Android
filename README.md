@@ -15,13 +15,13 @@
 
 ```
 repositories {
-    maven { url 'http://altonotes.github.io/Android-Kibaan/repository' }
+    maven { url 'https://kibaan.github.io/AbstractHTTP-Android/repository' }
 }
 ```
 
 ```
 dependencies {
-	implementation 'jp.co.altonotes.abstracthttp:abstracthttp:0.7.00' // バージョンは最新を確認する
+	implementation 'jp.co.altonotes.abstracthttp:abstracthttp:0.7.11' // バージョンは最新を確認する
 }
 ```
 
@@ -34,7 +34,7 @@ AbstractHttpをアプリに組み込んだ状態でAbstractHttp内のクラス�
 
 ```
 include ':app', ':abstracthttp'
-project(':abstracthttp').projectDir = new File('../Android-Kibaan/abstracthttp')
+project(':abstracthttp').projectDir = new File('../AbstractHTTP-Android/abstracthttp')
 ```
 
 - build.gradle のAbstractHttpのdependencyを以下に変更
