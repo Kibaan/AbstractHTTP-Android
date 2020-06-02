@@ -102,9 +102,11 @@ open class Connection<ResponseModel: Any> {
      */
     open fun cancel() {
         // 既に実行完了している場合何もしない
-        val executionId = this.executionId ?: return
+        if (executionId == null) {
+            return
+        }
 
-        onCancel(executionId)
+        onCancel()
         httpConnector.cancel()
     }
 
@@ -130,7 +132,7 @@ open class Connection<ResponseModel: Any> {
 
         this.executionId = interruptedId
         this.interruptedId = null
-        onCancel(executionId = interruptedId)
+        onCancel()
     }
 
     /**
@@ -269,10 +271,25 @@ open class Connection<ResponseModel: Any> {
         }
     }
 
-    fun onCancel(executionId: ExecutionId) {
-        handleError(ConnectionErrorType.canceled, executionId = executionId) {
-            it.onCanceled(connection = this)
+    fun onCancel() {
+        callback {
+            executeCancelEvents()
         }
+
+        executionId = null
+        interruptedId = null
+    }
+
+    private fun executeCancelEvents() {
+        errorListeners.forEach { it.onCanceled(connection = this) }
+
+        val error = ConnectionError(type = ConnectionErrorType.canceled, nativeError = null)
+        errorListeners.forEach {
+            it.afterError(connection = this, response = null, responseModel = null, error = error)
+        }
+
+        listeners.forEach { it.onEnd(connection = this, response = null, responseModel = null, error = error) }
+        holder.remove(connection = this)
     }
 
     /**
