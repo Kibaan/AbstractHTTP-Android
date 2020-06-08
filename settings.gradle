@@ -1,2 +1,2 @@
-include ':app', ':abstracthttp'
+include ':Example', ':AbstractHTTP'
 rootProject.name='AbstractHTTP-Android'
