@@ -170,7 +170,7 @@ open class Connection<ResponseModel: Any> {
         holder.add(connection = this)
 
         if (isLogEnabled) {
-            print("[${requestSpec.httpMethod.stringValue}] $url")
+            println("[${requestSpec.httpMethod.stringValue}] $url")
         }
 
         // 通信する
@@ -306,7 +306,7 @@ open class Connection<ResponseModel: Any> {
         // エラーログ出力
         if (isLogEnabled) {
             val message = error?.toString() ?: ""
-            print("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
+            println("[ConnectionError] Type= ${type.description}, NativeMessage=${message}")
         }
 
         callback {
